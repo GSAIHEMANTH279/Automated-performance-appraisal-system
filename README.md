@@ -2,7 +2,7 @@
 
 A Software Engineering mini-project prototype for employee goal submission, manager review, and HR audit visibility.
 
-> **Current implementation:** a runnable Node.js/Express MVP is included on the feature branch. It supports demo sign-in, employee goal submission, manager/HR approval or return for revision, role-protected API routes, and an HR audit view. This is not yet the complete year-end appraisal product: scoring formulas, appraisal-cycle configuration, self-assessment, reporting/ranking, persistent production database, deployment, and instructor-template compliance remain future work.
+> **Current implementation:** the `main` branch contains a runnable Node.js/Express MVP. It supports demo sign-in, employee goal submission, manager/HR approval or return for revision, role-protected API routes, and an HR audit view. This is not yet the complete year-end appraisal product: scoring formulas, appraisal-cycle configuration, self-assessment, reporting/ranking, persistent production database, deployment, and instructor-template compliance remain future work. The SRS, SAD and Test Plan were aligned to the supplied course templates on 28 October 2026; they remain drafts pending guide review.
 
 ## Run locally
 
