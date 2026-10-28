@@ -1,0 +1,1 @@
+Local JSON storage is created automatically on first server start. Runtime data is intentionally ignored by Git.
