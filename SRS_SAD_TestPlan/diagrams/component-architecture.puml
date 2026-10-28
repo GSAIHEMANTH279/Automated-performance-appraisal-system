@@ -1,0 +1,28 @@
+@startuml
+skinparam componentStyle rectangle
+actor "Employee / Manager / HR" as User
+component "Web UI" as UI
+component "Application API" as API
+component "Authentication & Authorization" as AUTH
+component "Goal Management Service" as GOAL
+component "Appraisal Service" as APP
+component "Scoring & Ranking Service" as SCORE
+component "Reporting Service" as REPORT
+component "Audit Service" as AUDIT
+database "Application Database" as DB
+
+User --> UI
+UI --> API
+API --> AUTH
+API --> GOAL
+API --> APP
+APP --> SCORE
+API --> REPORT
+API --> AUDIT
+AUTH --> DB
+GOAL --> DB
+APP --> DB
+SCORE --> DB
+REPORT --> DB
+AUDIT --> DB
+@enduml
