@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a43">
+  <title>APAS · Performance Appraisal</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="APAS home"><span class="brand-mark">A</span><span>APAS <small>Performance Suite</small></span></a>
+    <div id="user-area" class="user-area hidden"><span id="user-label"></span><button id="logout-button" class="button button-quiet">Sign out</button></div>
+  </header>
+  <main class="page">
+    <section id="login-view" class="login-layout">
+      <div class="hero">
+        <p class="eyebrow">PEOPLE · GOALS · GROWTH</p>
+        <h1>Make performance<br><span>progress visible.</span></h1>
+        <p class="hero-copy">A single place to submit goals, review progress, and keep appraisal decisions accountable.</p>
+        <div class="hero-points"><span>✓ Goal tracking</span><span>✓ Manager review</span><span>✓ HR audit trail</span></div>
+      </div>
+      <form id="login-form" class="panel login-card">
+        <p class="eyebrow">WELCOME BACK</p><h2>Sign in</h2><p class="muted">Use one of the local demo accounts below.</p>
+        <label>Email address<input name="email" type="email" autocomplete="username" required placeholder="you@company.com"></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required placeholder="Enter password"></label>
+        <button class="button button-primary full-width" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        <p id="login-error" class="error" role="alert"></p>
+        <details class="demo-accounts"><summary>Demo account credentials</summary>
+          <p><b>Employee</b> · employee@apas.local / employee123</p>
+          <p><b>Manager</b> · manager@apas.local / manager123</p>
+          <p><b>HR</b> · hr@apas.local / hr123</p>
+        </details>
+      </form>
+    </section>
+    <section id="app-view" class="hidden">
+      <div class="page-heading"><div><p class="eyebrow">WORKSPACE</p><h1 id="welcome-title">Your appraisal workspace</h1><p id="welcome-copy" class="muted">Track goals and decisions.</p></div><button id="refresh-button" class="button button-secondary">↻ Refresh</button></div>
+      <div id="stats" class="stats-grid"></div>
+      <section id="employee-tools" class="panel hidden">
+        <div class="section-heading"><div><p class="eyebrow">NEW OBJECTIVE</p><h2>Submit a goal</h2></div><span class="pill">Employee</span></div>
+        <form id="goal-form" class="goal-form">
+          <label>Goal title<input name="title" required minlength="3" maxlength="120" placeholder="e.g. Complete the cloud certification"></label>
+          <label>Due date<input name="dueDate" type="date" required></label>
+          <label class="wide">Description<textarea name="description" rows="3" maxlength="1000" placeholder="What will you work on?"></textarea></label>
+          <label class="wide">Success metric<input name="metric" maxlength="200" placeholder="How will success be measured?"></label>
+          <div class="wide form-footer"><span class="muted small">Submitted goals are visible to managers for review.</span><button class="button button-primary" type="submit">Submit goal →</button></div>
+        </form><p id="goal-message" class="notice" role="status"></p>
+      </section>
+      <section class="content-section"><div class="section-heading"><div><p class="eyebrow">GOAL PIPELINE</p><h2 id="goals-heading">Goals</h2></div><span id="goal-count" class="muted small"></span></div><div id="goals-list" class="goals-list"></div></section>
+      <section id="audit-section" class="content-section hidden"><div class="section-heading"><div><p class="eyebrow">ACCOUNTABILITY</p><h2>Recent audit events</h2></div></div><div id="audit-list" class="audit-list"></div></section>
+    </section>
+    <div id="toast" class="toast hidden" role="status"></div>
+    <footer>APAS · Software Engineering mini-project <span>Prototype build · not for real employee data</span></footer>
+  </main>
+</body>
+</html>
