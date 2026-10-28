@@ -10,6 +10,18 @@ Deliver a demonstrable, testable employee-appraisal workflow—not only screens 
 
 ## 2. Sprint plan
 
+The initial Sprint 1 work items have been created as GitHub issues:
+- [APAS-01 — Review course-template documents](https://github.com/GSAIHEMANTH279/Automated-performance-appraisal-system/issues/2)
+- [APAS-02 — Approve scoring and ranking policy](https://github.com/GSAIHEMANTH279/Automated-performance-appraisal-system/issues/3)
+- [APAS-03 — Confirm stack and local setup](https://github.com/GSAIHEMANTH279/Automated-performance-appraisal-system/issues/4)
+- [APAS-04 — Establish PR and CI workflow](https://github.com/GSAIHEMANTH279/Automated-performance-appraisal-system/issues/5)
+- [APAS-05 — Authentication and role authorization](https://github.com/GSAIHEMANTH279/Automated-performance-appraisal-system/issues/6)
+- [APAS-06 — Goal submission and manager review](https://github.com/GSAIHEMANTH279/Automated-performance-appraisal-system/issues/7)
+- [APAS-07 — Automated tests for the vertical slice](https://github.com/GSAIHEMANTH279/Automated-performance-appraisal-system/issues/8)
+
+These issues are currently unassigned; the team must assign real owners and add them to the actual sprint/project board. The estimates below are proposals, not evidence of completed work.
+
+
 Dates below follow the current course schedule as understood by the team. If the instructor's latest announcement differs, use the instructor's dates and update this file.
 
 ### Sprint 1 — 27–31 October 2026
