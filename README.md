@@ -67,8 +67,6 @@ The JSON-file storage and in-memory sessions are suitable only for a single-proc
 - [SRS](SRS_SAD_TestPlan/SRS.md)
 - [SAD](SRS_SAD_TestPlan/SAD.md)
 - [Test Plan](SRS_SAD_TestPlan/Test_Plan.md)
-- [Project execution plan](PROJECT_EXECUTION_PLAN.md)
-- [Decision register](DECISIONS.md)
 - [Requirements traceability matrix](SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)
 
 These documents remain drafts until reviewed against the course-provided templates.
