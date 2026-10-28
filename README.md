@@ -77,6 +77,9 @@ The implementation language, framework, database, and deployment target remain *
 - [Software Architecture and Design Specification (SAD)](SRS_SAD_TestPlan/SAD.md)
 - [Software Test Plan](SRS_SAD_TestPlan/Test_Plan.md)
 - [UML diagram sources](SRS_SAD_TestPlan/diagrams/)
+- [Project execution plan and sprint backlog](PROJECT_EXECUTION_PLAN.md)
+- [Architecture/scoring decision register](DECISIONS.md)
+- [Requirements traceability matrix](SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)
 
 These are currently Markdown drafts. They must be aligned with the course-provided templates before submission; the team should not claim template compliance until that review is complete.
 
