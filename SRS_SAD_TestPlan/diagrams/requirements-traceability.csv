@@ -1,0 +1,11 @@
+Requirement ID,Feature area,Test IDs,Planned evidence,Status
+FR-001,Authentication and role access,TC-AUTH-01;TC-AUTH-02;TC-AUTH-03;TC-AUTH-04,Automated tests and CI run,Not implemented
+FR-002,Appraisal cycle configuration,TC-CYCLE-01;TC-CYCLE-02,Automated tests and UI/API evidence,Not implemented
+FR-003;FR-004,Goal submission and manager review,TC-GOAL-01;TC-GOAL-02;TC-GOAL-03;TC-GOAL-04,Feature PR and automated tests,Not implemented
+FR-005,Progress updates,TC-GOAL-05,Automated tests and audit timestamp,Not implemented
+FR-007;FR-008,Self and manager assessment,TC-APP-01;TC-APP-02;TC-APP-03,Automated tests and demo evidence,Not implemented
+FR-009;FR-010,Score calculation and ranking,TC-SCORE-01;TC-SCORE-02;TC-SCORE-03;TC-SCORE-04;TC-SCORE-05,Independent scoring fixtures and test report,Not implemented
+FR-011;FR-015,HR finalization and reopening,TC-REL-01;TC-REL-02;TC-REL-03,Authorization tests and audit evidence,Not implemented
+FR-014;SR-005,Audit trail,TC-AUD-01;TC-AUD-02,Automated tests and audit records,Not implemented
+NFR-001,Performance,TC-PERF-01,Load test report with environment and p95 latency,Not run
+SR-001;SR-002;SR-004,Security and input handling,TC-SEC-01;TC-SEC-02;TC-SEC-03,Security test evidence,Not implemented
