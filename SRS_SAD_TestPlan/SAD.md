@@ -1,213 +1,190 @@
 # Software Architecture and Design Specification (SAD)
-## Automated Performance Appraisal System
+**Project:** Automated Performance Appraisal System (APAS)  
+**Version:** 1.1 | **Date:** 28 October 2026 | **Authors:** APAS project team  
+**Status:** Draft for review; separates current implementation from proposed design.
 
-**Version:** 1.0 (Draft for team review)  
-**Date:** 28 October 2026  
-**Status:** Proposed design — verify against the implementation
+## Revision history
+| Version | Date | Author | Change summary |
+|---|---|---|---|
+| 1.0 | 28-Oct-2026 | Project team | Initial architecture draft |
+| 1.1 | 28-Oct-2026 | Project team | Aligned stack, APIs and states with MVP; clarified future components |
+
+## Approvals
+| Role | Name | Approval/date |
+|---|---|---|
+| Team representative | To be assigned | Pending |
+| Project guide/evaluator | To be assigned | Pending |
 
 ## 1. Introduction
 
 ### 1.1 Purpose
-This document describes a maintainable architecture for the Automated Performance Appraisal System, covering goal management, progress tracking, appraisals, score calculation, ranking, reporting, and auditability.
+Describe the architecture and design of APAS, including the currently implemented goal workflow and the proposed full appraisal lifecycle.
 
 ### 1.2 Scope
-The initial design focuses on a role-based web application. It excludes payroll integration, recruitment, and automatic employment decisions.
+Current MVP supports demo authentication, employee goal submission, manager/HR goal review and HR audit viewing. Cycle management, self-assessment, score/rank calculation, finalization, reporting and deployment are future increments.
 
 ### 1.3 Audience
-Developers, testers, project guide, HR stakeholders, and evaluators.
+Developers, testers, project guide, HR stakeholders and evaluators.
 
-## 2. Document overview and related documents
-- SRS: `SRS.md`
-- Test Plan: `Test_Plan.md`
-- The final submission should also include rendered UML component/use-case/sequence diagrams and an API specification appropriate to the chosen stack.
+### 1.4 Definitions
+API: application programming interface; RBAC: role-based access control; MVP: minimum viable prototype; ADR: architecture decision record.
+
+## 2. Document overview
+
+### 2.1 How to use this document
+Read the current architecture and implemented API sections as descriptions of the repository. Sections explicitly marked proposed describe the future design, not existing functionality.
+
+### 2.2 Related documents
+- SRS: [SRS.md](SRS.md)
+- Test Plan: [Test_Plan.md](Test_Plan.md)
+- Decision register: [../../DECISIONS.md](../../DECISIONS.md)
 
 ## 3. Architecture
 
 ### 3.1 Goals and constraints
-**Goals:** separation of concerns, secure role-based access, reproducible scoring, auditable changes, understandable workflows, and testability.
-
-**Constraints:** the exact framework and database are not yet confirmed. The architecture below is technology-neutral and should be mapped to the team's selected stack before implementation.
+Goals are understandable separation of concerns, server-enforced authorization, traceability and testability. The current prototype is designed for local classroom demonstration only. It does not claim production availability or compliance.
 
 ### 3.2 Stakeholders and concerns
-- Employees: ease of use, privacy, transparent status.
-- Managers: accurate team review and feedback.
-- HR: consistent appraisal policy, reporting, audit trail.
-- Developers: modularity and testability.
-- Evaluators: traceable requirements, test evidence, and working CI/CD.
+- Employees: privacy and understandable goal status.
+- Managers: correct review permissions and feedback.
+- HR: audit visibility and consistent policy.
+- Developers: maintainable code and tests.
+- Evaluators: consistency across SRS, design, tests and CI.
 
-### 3.3 Chosen architecture pattern and rationale
-**Proposed pattern: layered monolithic web application.** A presentation layer, application/service layer, domain rules layer, and persistence layer are sufficient for a student mini-project. This keeps deployment simple while separating business rules. Microservices are not proposed because they add operational complexity without a demonstrated need.
-
-### 3.4 Logical component diagram
+### 3.3 Component (UML) diagram
+Current implementation is a small layered monolith:
 
 ```mermaid
 flowchart TD
-    U[Employee / Manager / HR] --> UI[Web UI]
-    UI --> API[Application API / Controllers]
-    API --> AUTH[Authentication & Authorization]
-    API --> GOAL[Goal Management Service]
-    API --> APP[Appraisal Service]
-    APP --> SCORE[Scoring & Ranking Service]
-    API --> REPORT[Reporting Service]
-    API --> AUDIT[Audit Service]
-    AUTH --> DB[(Application Database)]
-    GOAL --> DB
-    APP --> DB
-    SCORE --> DB
-    REPORT --> DB
-    AUDIT --> DB
+  User[Employee / Manager / HR] --> Browser[HTML CSS JavaScript UI]
+  Browser --> Express[Express HTTP API]
+  Express --> Auth[Session and role checks]
+  Express --> Goal[Goal submission and review handlers]
+  Express --> Audit[Audit event handling]
+  Auth --> Store[(Local JSON store)]
+  Goal --> Store
+  Audit --> Store
 ```
 
-### 3.5 Component descriptions
-- **Web UI:** role-specific dashboards, goal forms, review screens, appraisal summaries, and reports.
-- **Application API/controllers:** validates requests, calls services, maps results to responses.
-- **Authentication/authorization:** identifies users and enforces role plus record-level access.
-- **Goal management service:** creates goals and handles submission, approval, rejection, and progress updates.
-- **Appraisal service:** manages self-assessment, manager review, status transitions, and finalization.
-- **Scoring/ranking service:** applies the approved rating scale and weights, computes final scores, handles ties, and excludes ineligible records.
-- **Reporting service:** prepares authorized cycle and ranking summaries.
-- **Audit service:** records important actions with actor, timestamp, action, and target record.
-- **Persistence layer:** stores users, role/manager relationships, cycles, goals, ratings, results, and audit events.
+Proposed future components include cycle configuration, progress tracking, assessment, scoring/ranking and reporting services. These are not yet present as independent modules.
+
+### 3.4 Component descriptions
+- **Browser UI:** `public/index.html`, `public/styles.css`, `public/app.js`; renders login and role-based goal/audit screens.
+- **HTTP API:** `server.js`; Express routes and JSON request validation.
+- **Authentication:** demo accounts use scrypt password hashes; server issues an HttpOnly, SameSite session cookie and checks roles for protected routes.
+- **Goal workflow:** stores a goal and permits manager/HR review actions.
+- **Audit:** records login/logout, goal submission and review events in the JSON store.
+- **Persistence:** `data/store.json` is generated locally and ignored by Git. In-memory sessions and JSON persistence are not suitable for multi-instance/production use.
+- **Future services:** appraisal cycle, progress, assessment, scoring/ranking and reporting remain planned.
+
+### 3.5 Chosen architecture pattern and rationale
+A **layered monolithic web application** is appropriate for this classroom MVP: one server process serves static UI and API endpoints, with simple local persistence. Microservices would add unnecessary deployment complexity for the current scope.
 
 ### 3.6 Technology stack and data stores
-The implementation stack is **to be confirmed by the team**. Choose one supported frontend/backend/database combination and document exact versions in the final SAD. Do not claim a framework or database is used until it exists in the repository.
+| Layer | Actual current choice | Status/limitation |
+|---|---|---|
+| UI | HTML, CSS, browser JavaScript | Implemented |
+| Server/API | Node.js and Express | Implemented |
+| Local storage | JSON file | Implemented for demo only; no database |
+| Authentication | scrypt hashes, in-memory sessions, HttpOnly/SameSite cookie | Demo implementation; sessions reset on restart |
+| Automated tests | Node built-in test runner and Fetch | Implemented subset |
+| CI | GitHub Actions, Node.js 22, `npm run check` | Workflow configured; check latest Actions for result |
+| Production database/deployment | Not selected | Future decision |
 
-### 3.7 Data model (logical)
-- **User:** user_id, name, email, role, manager_id, account_status.
-- **AppraisalCycle:** cycle_id, name, start_date, end_date, status, policy_version.
-- **Goal:** goal_id, employee_id, cycle_id, title, description, target, due_date, weight, status.
-- **ProgressUpdate:** update_id, goal_id, progress_value, evidence_note, created_at, created_by.
-- **GoalReview:** review_id, goal_id, reviewer_id, decision, comment, reviewed_at.
-- **Assessment:** assessment_id, employee_id, cycle_id, assessor_id, assessment_type, status, submitted_at.
-- **Rating:** rating_id, assessment_id, criterion_id, rating_value, comment, evidence_note.
-- **Criterion:** criterion_id, cycle_id, name, description, weight, rating_min, rating_max.
-- **FinalResult:** result_id, employee_id, cycle_id, score, rank, status, finalized_by, finalized_at.
-- **AuditEvent:** event_id, actor_id, action, entity_type, entity_id, timestamp, reason.
-
-Foreign keys and uniqueness constraints should prevent duplicate employee/cycle assessments and orphaned records. Sensitive fields should be limited to the minimum necessary.
-
-### 3.8 Scoring and ranking design
-The exact formula must be approved before coding. A possible weighted-score model is:
-
-`Final Score = sum(criterion weight × normalized criterion rating) / sum(applicable criterion weights)`
-
-This formula is a proposal only. Define how missing ratings, goal weights, different rating scales, ties, and incomplete appraisals are handled. Ranking must use finalized results from the same cycle and policy version; draft results must not appear in released ranking reports.
-
-### 3.9 Traceability to requirements
-- Authentication component: FR-001 and SR-001 to SR-003.
-- Goal management: FR-003 to FR-006.
-- Appraisal service: FR-007, FR-008, FR-011.
-- Scoring/ranking: FR-009 and FR-010.
-- Reporting/audit: FR-012 to FR-015 and SR-005.
-
-### 3.10 Risks and mitigations
+### 3.7 Risks and mitigations
 | Risk | Mitigation |
 |---|---|
-| Unclear or changing scoring rules | Agree and version the policy before implementation. |
-| Unauthorized access to employee data | Server-side role and record-level checks plus negative tests. |
-| Inconsistent scores after policy changes | Store policy version and inputs used for finalized results. |
-| Duplicate submission or partial finalization | Use transactions/idempotent actions and test retry behaviour. |
-| Scope grows beyond sprint time | Deliver goal workflow and one complete appraisal cycle first. |
+| JSON file corruption or concurrent writes | Replace with transactional database before multi-user/production use |
+| Session loss on restart | Adopt secure persistent session store for deployment |
+| Unauthorized manager review | Implement manager-to-employee assignment and negative tests |
+| Unapproved scoring policy | Obtain written guide/team approval before coding scoring |
+| Overstated completion | Keep implementation status in SRS and test evidence explicit |
 
-### 3.11 Security architecture
-Threat considerations:
-- **Spoofing:** secure authentication and session handling.
-- **Tampering:** server-side validation, controlled status transitions, and audit events.
-- **Information disclosure:** role/record-level authorization and HTTPS.
-- **Repudiation:** timestamped audit trail for sensitive actions.
-- **Denial of service:** sensible request limits and input-size validation where applicable.
-- **Elevation of privilege:** deny-by-default authorization and tests for role boundaries.
+### 3.8 Traceability to requirements
+- Authentication: FR-001, SR-002, SR-003.
+- Goal workflow: FR-003, FR-004.
+- Audit events: FR-014, SR-005.
+- Cycle, progress, assessment, scoring, ranking and release: FR-002, FR-005, FR-007–FR-013, FR-015 are future components.
+
+### 3.9 Security architecture
+Threat considerations: spoofing (credential checks and session cookies), tampering (server-side validation and controlled review transitions), information disclosure (role checks and future record-level scoping), repudiation (audit events), denial of service (request size limit and login throttling), and elevation of privilege (deny-by-default role middleware). Current demo has no production TLS configuration or persistent session store and must not be used for real employee data.
 
 ## 4. Design
 
-### 4.1 Design overview
-Use explicit state transitions for the lifecycle:
-- Goal: Draft → Submitted → Approved / Changes Requested / Rejected.
-- Appraisal: Open → Self-assessment Submitted → Manager Review → HR Finalization → Released.
-- Finalized or released records should not be silently edited. Any authorized reopening must require a reason and create an audit event.
+### 4.1 Design overview and state model
+Current goal statuses are **Submitted**, **Approved**, and **Needs revision**. The current review endpoint allows a goal to be reviewed when Submitted or Needs revision. It does not implement Draft, Rejected, appraisal-cycle states or final results. Proposed future appraisal states: Open → Self-assessment Submitted → Manager Review → HR Finalization → Released.
 
-### 4.2 Sequence diagram 1 — goal submission and approval
-
+### 4.2 Sequence diagram 1 — submit and review a goal
 ```mermaid
 sequenceDiagram
-    actor E as Employee
-    participant UI as Web UI
-    participant API as Application API
-    participant GS as Goal Service
-    participant DB as Database
-    actor M as Manager
-    E->>UI: Enter goal and submit
-    UI->>API: Submit goal
-    API->>GS: Validate employee and cycle
-    GS->>DB: Save goal as Submitted
-    DB-->>GS: Saved goal
-    GS-->>UI: Submission confirmation
-    M->>UI: Review submitted goal
-    UI->>API: Approve or request changes
-    API->>GS: Validate reviewer authority
-    GS->>DB: Save decision and audit event
-    DB-->>GS: Updated status
-    GS-->>UI: Updated goal status
+ actor E as Employee
+ participant UI as Browser UI
+ participant API as Express API
+ participant Store as JSON Store
+ E->>UI: Complete goal form
+ UI->>API: POST /api/goals
+ API->>API: Authenticate, authorize and validate
+ API->>Store: Persist goal and audit event
+ Store-->>API: Saved
+ API-->>UI: 201 Created
+ actor M as Manager/HR
+ M->>UI: Review submitted goal
+ UI->>API: PATCH /api/goals/:id/review
+ API->>API: Check role and transition
+ API->>Store: Save decision and audit event
+ API-->>UI: Updated goal
 ```
 
-### 4.3 Sequence diagram 2 — appraisal finalization and ranking
-
+### 4.3 Sequence diagram 2 — HR audit review (implemented)
 ```mermaid
 sequenceDiagram
-    actor M as Manager
-    participant UI as Web UI
-    participant API as Application API
-    participant AS as Appraisal Service
-    participant SS as Scoring Service
-    participant DB as Database
-    actor H as HR Admin
-    M->>UI: Submit assessment and ratings
-    UI->>API: Save manager assessment
-    API->>AS: Validate cycle and required ratings
-    AS->>DB: Persist assessment
-    H->>UI: Request finalization
-    UI->>API: Finalize cycle results
-    API->>AS: Check authorization and completeness
-    AS->>SS: Calculate scores and ranks
-    SS->>DB: Read approved policy and ratings
-    DB-->>SS: Scoring inputs
-    SS->>DB: Store results and rank order
-    AS->>DB: Record finalization audit event
-    AS-->>UI: Finalization summary
+ actor H as HR
+ participant UI as Browser UI
+ participant API as Express API
+ participant Store as JSON Store
+ H->>UI: Open audit view
+ UI->>API: GET /api/audit
+ API->>API: Authenticate and require HR role
+ API->>Store: Read audit events
+ Store-->>API: Events
+ API-->>UI: Event list
 ```
+Score calculation/finalization is not implemented; a sequence diagram for it should be added when that workflow is built.
 
-### 4.4 API design (illustrative; paths must match implementation)
+### 4.4 API design
+**Implemented endpoint A — submit a goal**
+- Method/path: `POST /api/goals`
+- Auth: employee role required.
+- Request: `title`, `description`, `metric`, `dueDate`.
+- Success: `201 Created` with goal data.
+- Errors: `400` validation error, `401` unauthenticated, `403` wrong role.
 
-**Endpoint A — submit a goal**
-- Method: POST
-- Proposed path: `/api/goals`
-- Request fields: title, description, target, dueDate, cycleId, weight.
-- Success: `201 Created` with goal ID and status.
-- Validation errors: `400 Bad Request`; unauthenticated: `401 Unauthorized`; forbidden: `403 Forbidden`.
-- Security: employee identity comes from the authenticated session/token, not a trusted client-supplied employee ID.
+**Implemented endpoint B — review a goal**
+- Method/path: `PATCH /api/goals/:id/review`
+- Auth: manager or HR role required.
+- Request: `status` (Approved or Needs revision), `comment`.
+- Success: `200 OK` with updated goal.
+- Errors: `400` invalid decision, `401` unauthenticated, `403` wrong role, `404` unknown goal, `409` invalid current state.
+- Limitation: assigned-manager-to-employee relationship is not yet enforced; this must be fixed before claiming record-level authorization.
 
-**Endpoint B — finalize an appraisal cycle**
-- Method: POST
-- Proposed path: `/api/appraisal-cycles/{cycleId}/finalize`
-- Request fields: optional reason or confirmation token, as selected by implementation.
-- Success: summary of finalized result count and cycle status.
-- Errors: `401` unauthenticated, `403` unauthorized, `409 Conflict` for incomplete/already-finalized cycle, `422 Unprocessable Entity` for invalid state.
-- Security: HR authorization, completeness checks, transaction-safe writes, and audit event are mandatory.
+Other current routes: `GET /api/health`, `POST /api/login`, `POST /api/logout`, `GET /api/me`, `GET /api/goals`, `GET /api/audit` (HR only).
 
-### 4.5 Error handling, logging, and monitoring
-Return consistent error structures with a safe user-facing message and correlation/request ID where supported. Never log passwords, authentication tokens, or unnecessary appraisal content. Record relevant business audit events separately from diagnostic logs.
+**Proposed endpoint, not implemented:** `POST /api/appraisal-cycles/:cycleId/finalize`. It must require HR authorization, complete ratings, a versioned approved scoring policy, transaction-safe writes and audit logging before it is added.
+
+### 4.5 Error handling, logging and monitoring
+API returns safe JSON error messages. Request body size is limited; credentials are hashed; security response headers are set. Audit events are stored separately within the same JSON file. Production monitoring, central logs, database transactions and deployment TLS remain future work.
 
 ### 4.6 UX design
-Provide clear progress/status labels, explain rating scales, show validation beside the relevant field, confirm irreversible actions, and distinguish draft scores from released results. Ensure tables and forms are usable by keyboard and have accessible labels.
+Current interface offers role-based workspace, status pills, goal forms, review feedback and HR audit list. Accessibility review and formal usability testing remain outstanding.
 
 ### 4.7 Open issues and next steps
-1. Confirm scoring criteria, weights, rating scale, tie handling, and policy owner.
-2. Select and record the technology stack.
-3. Implement authentication and role checks before adding appraisal data.
-4. Implement goal workflow, then one end-to-end appraisal cycle.
-5. Add actual rendered UML diagrams and align endpoint examples with the code.
-6. Add tests and an application CI/CD workflow after the stack and build commands are known.
+1. Enforce assigned-manager/employee relationship before using real records.
+2. Confirm scoring policy and tie handling with guide/team.
+3. Replace JSON file and in-memory sessions before multi-user deployment.
+4. Implement appraisal cycles, progress, self-assessment, manager ratings, scoring, finalization and reports.
+5. Render/verify UML diagrams and add API contract tests.
+6. Keep CI results and the test execution report linked to the exact commit.
 
 ## 5. Appendices
-**Glossary:** KPI, appraisal cycle, RBAC, API, audit event.  
-**Tools (proposed):** a UML editor such as PlantUML or Mermaid, a version-controlled API specification, and the team's chosen test framework.
+**Glossary:** KPI, RBAC, API, audit event, appraisal cycle.  
+**References/tools:** project SRS and Test Plan; Mermaid for diagram source. Any additional standards/tools should be listed only when actually used.
