@@ -1,0 +1,46 @@
+name: Appraisal Project Documentation Check
+
+on:
+  push:
+    paths:
+      - "SRS_SAD_TestPlan/**"
+      - "README.md"
+      - ".github/workflows/appraisal-docs-check.yml"
+  pull_request:
+    paths:
+      - "SRS_SAD_TestPlan/**"
+      - "README.md"
+      - ".github/workflows/appraisal-docs-check.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-documents:
+    name: Verify required project documents
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify required documents exist and are non-empty
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in README.md SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md; do
+            if [ ! -s "$file" ]; then
+              echo "Required document missing or empty: $file"
+              exit 1
+            fi
+            echo "Verified: $file"
+          done
+
+      - name: Check required project title in deliverables
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md; do
+            if ! grep -qi "Automated Performance Appraisal System" "$file"; then
+              echo "Project title missing from $file"
+              exit 1
+            fi
+          done
+          echo "Project title check passed."
