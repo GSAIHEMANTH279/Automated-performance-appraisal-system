@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+actor Employee
+actor Manager
+actor "HR Administrator" as HR
+
+rectangle "Automated Performance Appraisal System" {
+  usecase "Sign in" as UC1
+  usecase "Create / submit goals" as UC2
+  usecase "Update goal progress" as UC3
+  usecase "Submit self-assessment" as UC4
+  usecase "Review and approve goals" as UC5
+  usecase "Assess employee performance" as UC6
+  usecase "Validate required ratings" as UC7
+  usecase "Calculate final score" as UC8
+  usecase "Finalize appraisal cycle" as UC9
+  usecase "Release appraisal results" as UC10
+  usecase "Record audit event" as UC11
+}
+Employee --> UC1
+Employee --> UC2
+Employee --> UC3
+Employee --> UC4
+Manager --> UC1
+Manager --> UC5
+Manager --> UC6
+HR --> UC1
+HR --> UC9
+HR --> UC10
+UC6 .> UC7 : <<include>>
+UC9 .> UC8 : <<include>>
+UC5 .> UC11 : <<include>>
+UC9 .> UC11 : <<include>>
+UC10 .> UC9 : <<extend>>
+[cycle approved for release]
+@enduml
