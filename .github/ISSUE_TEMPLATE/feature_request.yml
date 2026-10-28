@@ -1,0 +1,47 @@
+name: Feature request
+description: Propose a scoped feature for the appraisal system
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or user need
+      description: Which user role has this need, and why?
+      placeholder: As an employee/manager/HR administrator...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: Describe the expected system behaviour without assuming it is already implemented.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that will prove the issue is complete.
+      placeholder: |
+        - Given ...
+        - When ...
+        - Then ...
+    validations:
+      required: true
+  - type: dropdown
+    id: role
+    attributes:
+      label: Primary user role
+      options:
+        - Employee
+        - Reporting manager
+        - HR administrator
+        - Developer/tester
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Story points (team estimate)
+      description: Leave blank until the team estimates it.

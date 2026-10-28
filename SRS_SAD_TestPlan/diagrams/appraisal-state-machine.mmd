@@ -1,0 +1,24 @@
+stateDiagram-v2
+    direction LR
+    [*] --> DraftGoal
+    DraftGoal --> GoalSubmitted: employee submits
+    GoalSubmitted --> GoalApproved: assigned manager approves
+    GoalSubmitted --> ChangesRequested: manager requests changes
+    ChangesRequested --> DraftGoal: employee revises
+    GoalApproved --> ProgressTracking
+    ProgressTracking --> SelfAssessmentSubmitted: employee submits self-review
+    SelfAssessmentSubmitted --> ManagerAssessment: assigned manager reviews
+    ManagerAssessment --> ReadyForHR: required ratings complete
+    ReadyForHR --> HRFinalized: HR finalizes after validation
+    HRFinalized --> ResultsReleased: HR releases results
+    ResultsReleased --> [*]
+    HRFinalized --> Reopened: authorized reopen with reason
+    Reopened --> ManagerAssessment
+    note right of HRFinalized
+      Score and policy version are stored.
+      Changes must be audited.
+    end note
+    note right of ResultsReleased
+      Only released results are visible
+      to employees according to policy.
+    end note

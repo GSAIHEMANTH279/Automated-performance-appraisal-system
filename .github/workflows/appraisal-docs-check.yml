@@ -5,35 +5,48 @@ on:
     paths:
       - "SRS_SAD_TestPlan/**"
       - "README.md"
+      - "CONTRIBUTING.md"
+      - "PROJECT_EXECUTION_PLAN.md"
+      - "DECISIONS.md"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
       - ".github/workflows/appraisal-docs-check.yml"
   pull_request:
     paths:
       - "SRS_SAD_TestPlan/**"
       - "README.md"
+      - "CONTRIBUTING.md"
+      - "PROJECT_EXECUTION_PLAN.md"
+      - "DECISIONS.md"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
       - ".github/workflows/appraisal-docs-check.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   validate-documents:
-    name: Verify required project documents
+    name: Verify project documentation baseline
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Verify required documents exist and are non-empty
+      - name: Verify required project files exist and are non-empty
         shell: bash
         run: |
           set -euo pipefail
-          for file in README.md SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md; do
+          for file in README.md CONTRIBUTING.md PROJECT_EXECUTION_PLAN.md DECISIONS.md SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md SRS_SAD_TestPlan/diagrams/requirements-traceability.csv SRS_SAD_TestPlan/diagrams/appraisal-state-machine.mmd; do
             if [ ! -s "$file" ]; then
-              echo "Required document missing or empty: $file"
+              echo "Required file missing or empty: $file"
               exit 1
             fi
             echo "Verified: $file"
           done
 
-      - name: Check required project title in deliverables
+      - name: Check project title in deliverables
         shell: bash
         run: |
           set -euo pipefail
@@ -44,3 +57,32 @@ jobs:
             fi
           done
           echo "Project title check passed."
+
+      - name: Check documentation status labels are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md; do
+            if ! grep -qiE "Status:.*(draft|proposed|planned)" "$file"; then
+              echo "Expected draft/proposed/planned status label missing from $file"
+              exit 1
+            fi
+          done
+          echo "Status-label check passed."
+
+      - name: Check traceability matrix structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          header="$(head -n 1 SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)"
+          expected="Requirement ID,Feature area,Test IDs,Planned evidence,Status"
+          if [ "$header" != "$expected" ]; then
+            echo "Traceability matrix header is invalid."
+            exit 1
+          fi
+          rows="$(wc -l < SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)"
+          if [ "$rows" -lt 2 ]; then
+            echo "Traceability matrix must contain requirement rows."
+            exit 1
+          fi
+          echo "Traceability matrix structure check passed."
