@@ -1,0 +1,23 @@
+flowchart LR
+  HR([HR / Admin])
+  Manager([Manager])
+  Employee([Employee])
+  Cycle((Configure appraisal cycle))
+  Policy((Configure criteria and weights))
+  TeamReport((View team report))
+  Ranking((Generate ranking report))
+  Audit((Inspect audit history))
+  Reopen((Reopen appraisal with reason))
+  Results((View released result))
+  HR --> Cycle
+  HR --> Policy
+  HR --> Ranking
+  HR --> Audit
+  HR --> Reopen
+  Manager --> TeamReport
+  Manager --> Audit
+  Employee --> Results
+  Cycle -. planned .-> Policy
+  Policy -. planned .-> Ranking
+  Reopen -. planned .-> Audit
+  Ranking -. planned .-> Results
