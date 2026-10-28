@@ -37,7 +37,6 @@ Read the current architecture and implemented API sections as descriptions of th
 ### 2.2 Related documents
 - SRS: [SRS.md](SRS.md)
 - Test Plan: [Test_Plan.md](Test_Plan.md)
-- Decision register: [../../DECISIONS.md](../../DECISIONS.md)
 
 ## 3. Architecture
 
