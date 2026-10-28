@@ -2,7 +2,7 @@
 
 A Software Engineering mini-project prototype for employee goal submission, manager review, and HR audit visibility.
 
-> **Current implementation:** the `main` branch contains a runnable Node.js/Express MVP. It supports demo sign-in, employee goal submission, manager/HR approval or return for revision, role-protected API routes, and an HR audit view. This is not yet the complete year-end appraisal product: scoring formulas, appraisal-cycle configuration, self-assessment, reporting/ranking, persistent production database, deployment, and instructor-template compliance remain future work. The SRS, SAD and Test Plan were aligned to the supplied course templates on 28 October 2026; they remain drafts pending guide review.
+> **Current implementation:** the `main` branch contains a runnable Node.js/Express MVP. It supports demo sign-in, employee goal submission, manager/HR approval or return for revision, role-protected API routes, and an HR audit view. This is not yet the complete year-end appraisal product: scoring formulas, appraisal-cycle configuration, self-assessment, reporting/ranking, persistent production database, deployment, and final instructor approval remain future work. The SRS, SAD and Test Plan were reorganized against the supplied course templates on 28 October 2026; they remain drafts pending a final guide review.
 
 ## Run locally
 
@@ -42,7 +42,7 @@ Run the syntax checks and automated API tests:
 npm run check
 ```
 
-The `App CI` GitHub Actions workflow installs dependencies, checks JavaScript syntax, and runs tests on pushes to the feature branch and pull requests targeting `main`. A separate documentation-check workflow validates project documentation. CI passing is evidence for these checks only; it is not a deployment or production-readiness claim.
+The `App CI` GitHub Actions workflow installs dependencies, checks JavaScript syntax, and runs tests on pushes to `main` or the `chore/strengthen-project-workflow` branch, and on pull requests targeting `main`. A separate documentation-check workflow validates project documentation. CI passing is evidence for these checks only; it is not a deployment or production-readiness claim.
 
 ## Scope and architecture
 
@@ -60,7 +60,7 @@ The JSON-file storage and in-memory sessions are suitable only for a single-proc
 - Replace local JSON storage with a database and add migrations.
 - Add appraisal-cycle configuration, progress updates, employee self-assessment, manager ratings, HR finalization, and authorized result release.
 - Add deeper validation, CSRF protections as needed for the chosen deployment, dependency/security checks, and integration tests.
-- Align SRS, SAD, and Test Plan with the exact course templates before submission.
+- Complete the guide's final review of the SRS, SAD, and Test Plan formatting and approval fields before submission.
 
 ## Project documents
 
