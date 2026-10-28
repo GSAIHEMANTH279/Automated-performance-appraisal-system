@@ -6,6 +6,8 @@ on:
       - "SRS_SAD_TestPlan/**"
       - "README.md"
       - "CONTRIBUTING.md"
+      - "PROJECT_EXECUTION_PLAN.md"
+      - "DECISIONS.md"
       - ".github/ISSUE_TEMPLATE/**"
       - ".github/PULL_REQUEST_TEMPLATE.md"
       - ".github/workflows/appraisal-docs-check.yml"
@@ -14,6 +16,8 @@ on:
       - "SRS_SAD_TestPlan/**"
       - "README.md"
       - "CONTRIBUTING.md"
+      - "PROJECT_EXECUTION_PLAN.md"
+      - "DECISIONS.md"
       - ".github/ISSUE_TEMPLATE/**"
       - ".github/PULL_REQUEST_TEMPLATE.md"
       - ".github/workflows/appraisal-docs-check.yml"
@@ -34,7 +38,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for file in README.md CONTRIBUTING.md SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md; do
+          for file in README.md CONTRIBUTING.md PROJECT_EXECUTION_PLAN.md DECISIONS.md SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md SRS_SAD_TestPlan/diagrams/requirements-traceability.csv SRS_SAD_TestPlan/diagrams/appraisal-state-machine.mmd; do
             if [ ! -s "$file" ]; then
               echo "Required file missing or empty: $file"
               exit 1
@@ -65,3 +69,20 @@ jobs:
             fi
           done
           echo "Status-label check passed."
+
+      - name: Check traceability matrix structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          header="$(head -n 1 SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)"
+          expected="Requirement ID,Feature area,Test IDs,Planned evidence,Status"
+          if [ "$header" != "$expected" ]; then
+            echo "Traceability matrix header is invalid."
+            exit 1
+          fi
+          rows="$(wc -l < SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)"
+          if [ "$rows" -lt 2 ]; then
+            echo "Traceability matrix must contain requirement rows."
+            exit 1
+          fi
+          echo "Traceability matrix structure check passed."
