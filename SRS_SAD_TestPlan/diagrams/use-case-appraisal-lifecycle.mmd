@@ -1,0 +1,26 @@
+flowchart LR
+  Employee([Employee])
+  Manager([Manager])
+  HR([HR / Admin])
+  Goal((Submit goal))
+  Review((Review / return goal))
+  Progress((Update progress))
+  Self((Submit self-assessment))
+  Rate((Assess employee))
+  Score((Calculate score))
+  Finalize((Finalize results))
+  Release((Release results))
+  Employee --> Goal
+  Employee --> Progress
+  Employee --> Self
+  Manager --> Review
+  Manager --> Rate
+  HR --> Review
+  HR --> Score
+  HR --> Finalize
+  HR --> Release
+  Goal -. planned .-> Progress
+  Self -. planned .-> Rate
+  Rate -. planned .-> Score
+  Score -. planned .-> Finalize
+  Finalize -. planned .-> Release
