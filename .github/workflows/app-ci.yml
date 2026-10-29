@@ -1,17 +1,22 @@
-name: App CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, chore/strengthen-project-workflow]
+    branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
-    name: Test appraisal MVP
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,5 +27,63 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Check syntax and run tests
-        run: npm run check
+      - name: Check JavaScript syntax
+        run: node --check server.js && node --check public/app.js
+
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run automated tests
+        run: npm test
+
+  deploy:
+    name: Deploy (Docker image)
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" -t apas:ci .
+
+      - name: Smoke test the container
+        run: |
+          docker run -d --name apas -p 3000:3000 apas:ci
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:3000/api/health; then echo; echo "Smoke test passed"; exit 0; fi
+            sleep 1
+          done
+          echo "Container did not become healthy"; docker logs apas; exit 1
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish image to ghcr.io
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          IMAGE="ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')"
+          docker tag apas:ci "$IMAGE:latest"
+          docker tag apas:ci "$IMAGE:sha-${GITHUB_SHA::7}"
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:sha-${GITHUB_SHA::7}"
+          echo "### Deployed image" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`$IMAGE:latest\` and \`$IMAGE:sha-${GITHUB_SHA::7}\`" >> "$GITHUB_STEP_SUMMARY"
