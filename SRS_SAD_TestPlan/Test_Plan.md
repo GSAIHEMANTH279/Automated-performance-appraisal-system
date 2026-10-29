@@ -1,161 +1,221 @@
-# Software Test Plan (STP)
-**Project:** Automated Performance Appraisal System (APAS)  
-**Version:** 1.1 | **Date:** 28 October 2026  
-**Authors:** APAS project team  
-**Status:** Draft; distinguish planned test cases from executed results.
+# Software Test Plan (STP) – Automated Performance Appraisal System
+
+**Project:** Automated Performance Appraisal System (APAS)
+**Version:** 1.2
+**Authors:** G Sai Hemanth (PES1UG24AM101), Nivas Reddy D (PES1UG24AM075), D A V Sreeram (PES1UG24AM076), J Karthik (PES1UG25AM804)
+**Date:** 29-10-2026
+**Status:** Draft for guide review
 
 ## Revision history
-| Version | Date | Change summary | Approval |
+
+| Version | Date | Author | Change summary |
 |---|---|---|---|
-| 1.0 | 28-Oct-2026 | Initial test plan | Pending |
-| 1.1 | 28-Oct-2026 | Template alignment and MVP scope clarification | Pending |
+| 1.0 | 27-10-2026 | Team 9 | Initial test plan |
+| 1.1 | 28-10-2026 | Team 9 | Template alignment and MVP scope |
+| 1.2 | 29-10-2026 | G Sai Hemanth | Test IDs aligned with SRS; full test case list; roles and dates assigned |
 
 ## 1. Introduction
 
-### 1.1 Purpose
-Define test objectives, scope, strategy, resources, schedule, responsibilities, risks and exit criteria for APAS.
+**Purpose:** This document defines the test plan for APAS v1.0. It outlines objectives, scope, strategy, resources, schedule and responsibilities for testing.
 
-### 1.2 Scope
-Current executable MVP scope: authentication, goal submission, manager/HR review, role checks and HR audit view. Planned product scope also includes cycles, progress updates, self-assessment, manager ratings, scoring, ranking, finalization, release and reporting; those features are not yet testable as implemented functionality.
+**Scope:** Testing covers authentication and role access, appraisal cycles, goal setting and review, progress updates, self-assessment, manager rating, scoring, ranking, finalization, reporting and audit logging. Payroll, recruitment and external HR integrations are excluded.
 
-### 1.3 References
-- [SRS](SRS.md)
-- [SAD](SAD.md)
-- GitHub Actions application CI workflow.
+**References:** [APAS SRS v1.2](SRS.md), [APAS SAD v1.2](SAD.md), [Project Execution Plan](../PROJECT_EXECUTION_PLAN.md), OWASP Top 10.
 
-### 1.4 Definitions
-TC: test case; STP: Software Test Plan; RTM: requirements traceability matrix; UAT: user acceptance testing; p95: 95th percentile latency.
+**Definitions:** TC – Test Case; STP – Software Test Plan; RTM – Requirements Traceability Matrix; UAT – User Acceptance Testing; p95 – 95th percentile latency; CI – Continuous Integration.
 
-## 2. Test items
-- Login/logout and session handling
-- Protected API and role middleware
-- Goal creation and validation
-- Goal review and status transitions
-- HR audit endpoint and event creation
-- Browser UI smoke check
-- Planned future: cycles, progress, assessment, scoring/ranking, finalization/release and reports.
+## 2. Test Items
 
-## 3. Features to be tested
-- FR-001 (partial), FR-003 (partial), FR-004 (partial), FR-014 (partial).
-- Relevant security requirements SR-002 and SR-003, subject to limitations below.
-- Automated tests currently in `test/app.test.js`: health response, anonymous access rejection, employee goal submission, employee forbidden from review, manager approval, HR audit visibility, invalid review decision.
-- Future requirements FR-002, FR-005–FR-013, FR-015 and remaining NFR/SR tests are planned, not passed.
+- Authentication and RBAC middleware
+- Goal service (submit, list, review, progress)
+- Appraisal cycle service
+- Assessment service (self-assessment, manager rating)
+- Scoring and ranking service
+- Finalization, reporting and history
+- Audit service
+- Web UI
 
-## 4. Features not to be tested in the current MVP
-- Appraisal-cycle configuration and cycle date validation.
-- Progress evidence, self-assessment and manager rating forms.
-- Score calculation, ranking/tie handling, finalization and result release.
-- Reports and history screens not implemented.
-- Production-scale availability, production TLS configuration and real employee-data security.
-- Payroll, recruitment or external HR integrations.
+## 3. Features to be Tested
 
-## 5. Test approach / strategy
+Features mapped to SRS requirement IDs:
+- FR-001: Sign-in and role access
+- FR-002: Appraisal cycle creation
+- FR-003 / FR-004 / FR-005: Goal submission, review, progress
+- FR-006: Role dashboard
+- FR-007 / FR-008: Self-assessment and manager rating
+- FR-009 / FR-010: Score calculation and ranking
+- FR-011 / FR-015: Finalization, release and reopen
+- FR-012 / FR-013: History and cycle report
+- FR-014: Audit logging
+- NFR-001 to NFR-005: performance, integrity, privacy, reproducibility, usability
+- SR-001 to SR-005: security requirements
 
-### 5.1 Test levels
-- **Unit:** input validation and future scoring/status logic.
-- **Integration/API:** authentication, authorization, goal workflow and audit events.
-- **System:** employee submission through manager review, followed by HR audit inspection.
-- **Acceptance/UAT:** demo employee, manager and HR scenarios against approved requirements.
-- **Regression:** rerun automated tests after changes.
+## 4. Features Not to be Tested
 
-### 5.2 Test types
-Functional, negative, boundary, authorization/security, data-integrity, usability, performance and regression testing.
+- Payroll, compensation and recruitment (out of scope)
+- Third-party HR / identity provider integrations (not used)
+- Express framework and Node.js internals (assumed tested by maintainers)
+- Production-scale availability (no production deployment)
 
-### 5.3 Entry criteria
-Testable commit available; Node.js 20+ and npm installed; dependencies installed; isolated synthetic test data; test accounts prepared; test instructions available.
+## 5. Test Approach / Strategy
 
-### 5.4 Exit criteria
-All planned high-priority tests executed; no unresolved critical defect; role/record authorization verified; scoring fixtures pass before scoring is claimed; failures and limitations recorded; test summary reviewed by team/guide. Current MVP does not meet full-product exit criteria.
+**Levels:**
+- Unit tests – scoring formula, rating bands, tie rule, input validation
+- Integration / API tests – authentication, authorization, goal, cycle, assessment and audit endpoints over HTTP
+- System tests – full flow: employee goal → manager approval → self-assessment → manager rating → HR finalize → ranking
+- Acceptance tests (UAT) – team walkthrough with demo employee, manager and HR accounts
 
-### 5.5 Security validation
-Check invalid login, role-protected endpoints, password hashes, input validation, cookie flags, unauthorized review attempts and audit integrity. Production HTTPS/TLS and full record-level manager authorization are not yet demonstrated. Do not claim production security compliance.
+**Types:**
+- Functional testing (positive and negative)
+- Regression testing (full automated suite on every push and PR via GitHub Actions)
+- Security testing (role bypass, input validation)
+- Performance testing (p95 latency)
+- Usability testing (forms, mobile width)
 
-## 6. Test environment
-- Runtime: Node.js 20+; CI currently configures Node.js 22.
-- Server: local Express process.
-- Storage: temporary JSON file for automated tests; local demo store for manual demonstration.
-- Client: current Chrome/Edge or another modern browser.
-- Tools: npm, Node built-in test runner, GitHub Actions.
-- Test data: synthetic demo users and goals only.
-Record operating system, browser version, commit SHA, run URL and date in the execution report. Performance thresholds are not measured yet.
+**Entry Criteria:** feature merged to a branch with a passing build, Node.js 20+ installed, synthetic test data available, test cases written.
+**Exit Criteria:** 100% of planned high-priority test cases executed, 0 critical defects open, scoring fixtures pass, RTM updated.
 
-## 7. Test schedule
-| Milestone | Planned period | Responsibility |
-|---|---|---|
-| Review SRS/SAD/STP and approve scoring policy | Sprint 1 | Whole team/guide |
-| Execute current API tests and record results | Sprint 1 | Assigned test owner |
-| Fix authorization and expand negative tests | Sprint 1–2 | Backend owner/test owner |
-| Test full appraisal workflow when implemented | Sprint 2 or later | Whole team |
-| Produce execution report and demo evidence | Before presentation | Test owner/team |
+### 5.1 Security Validation
+- Wrong-role and cross-employee access attempts (expect 403)
+- Anonymous access to protected routes (expect 401)
+- Password storage inspection (scrypt hash, no plaintext)
+- Malformed, oversized and boundary input on all forms and endpoints
+- Session cookie flags (HttpOnly, SameSite, Secure in production)
+- Login throttling after repeated failures (expect 429)
+- Absence of any audit mutation endpoint
 
-Dates are planning targets; update with actual completion dates rather than marking planned work complete.
+## 6. Test Environment
 
-## 8. Test deliverables
-- This STP and test case list
-- Automated test scripts
-- Synthetic test data
-- CI run links and execution logs
-- Defect reports and retest evidence
-- RTM and final test summary report.
+**Hardware:** team laptops (Windows/macOS/Linux) and GitHub-hosted Ubuntu runners.
+**Software:** APAS (current commit on `main`), Node.js 20+ locally, Node.js 22 in CI, Chrome/Edge latest.
+**Tools:** Node built-in test runner with fetch (API tests), GitHub Actions (CI), browser DevTools (UI and cookie checks), autocannon (performance, planned), Jira (defect tracking).
+**Test Data:** synthetic demo accounts (`employee@apas.local`, `manager@apas.local`, `hr@apas.local`) and generated goals; automated tests use a temporary data file.
 
-## 9. Roles and responsibilities
+## 7. Test Schedule
+
+| Milestone | Date |
+|---|---|
+| Test case design (Sprint 1 scope) | 27-Oct-2026 |
+| Environment and CI setup | 28-Oct-2026 |
+| Sprint 1 test execution | 29-Oct-2026 to 31-Oct-2026 |
+| Sprint 2 test case design | 02-Nov-2026 |
+| Sprint 2 test execution | 03-Nov-2026 to 06-Nov-2026 |
+| UAT and test summary report | 07-Nov-2026 |
+| Presentation | from 09-Nov-2026 |
+
+## 8. Test Deliverables
+
+- Test Plan (this document)
+- Test cases (section 13)
+- Automated test scripts (`test/`)
+- Test data (synthetic seed)
+- Test execution logs (GitHub Actions runs)
+- Defect reports (Jira / GitHub issues)
+- Test summary report
+
+## 9. Roles and Responsibilities
+
 | Role | Name | Responsibility |
 |---|---|---|
-| Test coordinator | To be assigned | Plan, coordinate and report test status |
-| Developer(s) | Project team | Implement/fix code and support triage |
-| Reviewer | Teammate/guide to be assigned | Review results and acceptance evidence |
-| Product representative | Team representative to be assigned | Confirm requirements and approve scope |
+| QA Lead | J Karthik | Prepare plan, maintain test cases and RTM, coordinate execution |
+| Test Engineer | D A V Sreeram | Design and execute test cases, log defects |
+| Developer | Nivas Reddy D | Support defect fixes and triage |
+| Product Owner | G Sai Hemanth | Review PRs, approve test results, sign off readiness |
 
-Do not assign names until the team confirms ownership.
+## 10. Risks and Mitigation
 
-## 10. Risks and mitigation
 | Risk | Mitigation |
 |---|---|
-| Assigned-manager authorization is not enforced | Implement relationship check and add negative test before claiming secure review |
-| Features are planned but not implemented | Mark their test cases Planned/Blocked, not Passed |
-| JSON persistence is fragile | Use isolated test files; plan database migration |
-| Scoring policy undecided | Obtain approval and add known-score fixtures before implementation |
-| Limited time before evaluation | Prioritize working vertical slice, test evidence and clear limitations |
+| Sprint 2 features delivered late, leaving little test time | Write tests with each feature PR; CI blocks merge on failure |
+| Scoring policy changes after tests are written | Keep fixtures tied to policy version; update fixtures in the same PR |
+| Shared JSON data affects test results | Each test run uses an isolated temporary data file |
+| Manager–employee assignment not yet implemented | TC-GOAL-04 marked Blocked until APAS-15 is merged |
 
-## 11. Assumptions and dependencies
-- Node.js and npm are available.
-- GitHub Actions is enabled for the repository.
-- The team will provide confirmed scoring rules and guide requirements.
-- Tests use synthetic data only.
-- Browser and runtime versions will be recorded at execution time.
+## 11. Assumptions & Dependencies
 
-## 12. Suspension and resumption criteria
-Suspend tests if the build cannot start, test data is corrupted, or the environment produces unreliable results. Resume after the build/environment is stable and test data is reset. Record skipped tests and reasons.
+- GitHub Actions remains enabled for the repository
+- Scoring policy v1 is approved by 31-Oct-2026
+- All team members can run the app locally with Node.js 20+
+- Only synthetic data is used
 
-## 13. Test case management and traceability
+## 12. Suspension & Resumption Criteria
 
-| Test ID | Requirement | Scenario | Expected result | Status |
-|---|---|---|---|---|
-| TC-SMOKE-01 | N/A | Request `GET /api/health` | HTTP 200 and status ok | Automated test exists |
-| TC-AUTH-01 | FR-001 | Access private goals without session | HTTP 401 | Automated test exists |
-| TC-AUTH-02 | FR-001/SR-003 | Employee attempts review action | HTTP 403 | Automated test exists |
-| TC-GOAL-01 | FR-003 | Employee submits valid goal | HTTP 201; goal stored | Automated test exists |
-| TC-GOAL-02 | FR-003 | Submit invalid goal fields | HTTP 400 and clear error | Planned additional test |
-| TC-GOAL-03 | FR-004 | Manager approves submitted goal | Status becomes Approved | Automated test exists |
-| TC-GOAL-04 | FR-004/SR-003 | Unassigned manager reviews employee goal | Denied; no state change | Blocked until manager assignment exists |
-| TC-AUD-01 | FR-014 | HR reads audit events after approval | Approval event visible | Automated test exists |
-| TC-AUD-02 | SR-005 | Attempt to alter audit events as ordinary user | Denied/no mutation endpoint | Manual/API review required |
-| TC-CYCLE-01 | FR-002 | HR creates cycle | Valid cycle stored | Not implemented |
-| TC-APP-01 | FR-007/008 | Submit self and manager assessment | Correct records saved | Not implemented |
-| TC-SCORE-01 | FR-009 | Score known ratings/weights | Expected score exactly matches | Not implemented |
-| TC-SCORE-02 | FR-010 | Rank finalized records with tie fixture | Documented order/tie policy applied | Not implemented |
-| TC-REL-01 | FR-011/015 | Finalize/reopen cycle | Authorized, audited state transition | Not implemented |
-| TC-PERF-01 | NFR-001 | Measure p95 for agreed workload | p95 ≤ 3 seconds | Not measured |
-| TC-SEC-01 | SR-001 | Verify deployed HTTPS | HTTPS policy satisfied | Not applicable to localhost; deployment not configured |
-| TC-SEC-02 | SR-002 | Inspect stored credentials | No plaintext password stored | Automated code/test review required |
-| TC-SEC-03 | SR-004 | Submit malformed input | Safe rejection/no unintended state change | Partially covered; expand tests |
+Suspend testing if:
+- The build fails to start or CI is unavailable for more than 4 hours
+- A blocking defect prevents more than 30% of test cases from running
 
-## 14. Test metrics and reporting
-Report planned, executed, passed, failed and blocked counts; pass rate among executed tests; open defects by severity/age; requirement coverage; and p95 latency with environment/workload. Do not claim results until a run has been inspected. Link the GitHub Actions run and record commit SHA/date in the final execution report.
+Resume testing if:
+- Blocking defects are fixed and merged
+- The build starts and the smoke test (TC-SMOKE-01) passes
+
+## 13. Test Case Management & Traceability
+
+Each test case maps to an SRS requirement; the full matrix is in SRS §8 and `diagrams/requirements-traceability.csv`.
+Status as of 29-Oct-2026: **Pass** = automated test passing in CI; **Not run** = feature exists, test not yet written/executed; **Planned** = feature not yet built; **Blocked** = waiting on a dependency.
+
+| Test ID | Req ID | Scenario | Expected result | Type | Status |
+|---|---|---|---|---|---|
+| TC-SMOKE-01 | – | `GET /api/health` | 200, `status: ok` | Automated | Pass |
+| TC-AUTH-01 | FR-001 | Sign in with valid employee credentials | 200, user role returned, session cookie set | Automated | Pass |
+| TC-AUTH-02 | FR-001 | Sign in with wrong password | 401, generic error message | Automated | Not run |
+| TC-AUTH-03 | FR-001 | Call `GET /api/goals` without a session | 401 | Automated | Pass |
+| TC-CYCLE-01 | FR-002 | HR creates cycle with valid dates | 201, cycle stored as Open | Automated | Planned |
+| TC-CYCLE-02 | FR-002 | End date before start date; employee tries to create cycle | 400; 403 | Automated | Planned |
+| TC-DASH-01 | FR-006 | Each role opens dashboard | Only permitted records and correct counts shown | Manual | Not run |
+| TC-GOAL-01 | FR-003 | Employee submits valid goal | 201, status Submitted | Automated | Pass |
+| TC-GOAL-02 | FR-003 | Submit goal with 2-character title / invalid date | 400 with clear message | Automated | Not run |
+| TC-GOAL-03 | FR-004 | Manager approves a submitted goal | 200, status Approved, comment saved | Automated | Pass |
+| TC-GOAL-04 | FR-004, NFR-003 | Manager reviews a goal of an employee they don't manage | 403, goal unchanged | Automated | Blocked (APAS-15) |
+| TC-GOAL-05 | FR-005 | Employee adds progress update to approved goal | 201, timestamp stored | Automated | Planned |
+| TC-APP-01 | FR-007 | Employee submits self-assessment in open cycle | 201, status Self-assessment submitted | Automated | Planned |
+| TC-APP-02 | FR-007 | Employee edits self-assessment after submit | 409 | Automated | Planned |
+| TC-APP-03 | FR-008 | Manager submits ratings; rating 6; unassigned manager | 201; 400; 403 | Automated | Planned |
+| TC-SCORE-01 | FR-009 | Score fixture from SRS §4.5.1 | Final score 4.02, band Exceeds | Unit | Planned |
+| TC-SCORE-02 | FR-009 | Calculate with a missing manager rating | Calculation/finalization rejected | Unit | Planned |
+| TC-SCORE-03 | FR-010 | Rank three finalized employees | Ordered by final score descending | Unit | Planned |
+| TC-SCORE-04 | FR-010 | Two employees with equal final score | Tie rule applied (manager score, then shared rank) | Unit | Planned |
+| TC-SCORE-05 | FR-010 | Cycle containing a non-finalized appraisal | Excluded from ranking | Unit | Planned |
+| TC-SCORE-06 | NFR-004 | Recalculate same inputs twice | Identical scores and ranks | Unit | Planned |
+| TC-REL-01 | FR-011 | HR finalizes and releases cycle | 200, results visible to employees, audited | Automated | Planned |
+| TC-REL-02 | FR-011 | Manager attempts to finalize | 403 | Automated | Planned |
+| TC-REL-03 | FR-015 | HR reopens without reason; with reason | 400; 200 and audited | Automated | Planned |
+| TC-REL-04 | NFR-002 | Send finalize twice / simulate write failure | No duplicate or partial results | Automated | Planned |
+| TC-HIST-01 | FR-012 | Employee views own history; another employee's | 200; 403 | Automated | Planned |
+| TC-REP-01 | FR-013 | HR generates cycle report; manager tries | Totals match finalized records; 403 | Automated | Planned |
+| TC-AUD-01 | FR-014 | HR reads audit after a goal approval | GOAL_APPROVED event present | Automated | Pass |
+| TC-AUD-02 | SR-005 | Attempt PUT/DELETE on `/api/audit` | 404, no change to audit log | Automated | Not run |
+| TC-SEC-01 | SR-003, NFR-003 | Employee calls review endpoint | 403 | Automated | Pass |
+| TC-SEC-02 | SR-001 | Access deployed instance over HTTP | Redirect/refusal; HTTPS only | Manual | Planned (no deployment yet) |
+| TC-SEC-03 | SR-002 | Inspect `data/store.json` user records | Only `salt:hash` values, no plaintext | Manual | Not run |
+| TC-SEC-04 | SR-004 | Invalid review decision; body > 32 KB | 400; 413, no state change | Automated | Pass (invalid decision); body-size case Not run |
+| TC-PERF-01 | NFR-001 | 20 concurrent users read `/api/goals` for 60 s | p95 ≤ 3 s | Tool | Planned |
+| TC-UX-01 | NFR-005 | Submit empty form; use at 360 px width; double-click final action | Clear message; usable layout; single record | Manual | Not run |
+
+**Automated test mapping (`test/app.test.js`, 5 tests passing on 29-Oct-2026):**
+- "health endpoint reports ready" → TC-SMOKE-01
+- "private routes reject anonymous requests" → TC-AUTH-03
+- "employee can sign in and submit a goal, but cannot review it" → TC-AUTH-01, TC-GOAL-01, TC-SEC-01
+- "manager can approve a submitted goal and HR can read audit events" → TC-GOAL-03, TC-AUD-01
+- "invalid review decisions are rejected" → TC-SEC-04 (invalid decision case)
+
+## 14. Test Metrics & Reporting
+
+**Metrics collected:**
+- % test cases executed (current: 8 of 35 executed, all passing)
+- % passed / failed
+- Defect density (defects per feature)
+- Defect aging (days open)
+- Requirement coverage (requirements with at least one passing test)
+
+**Reports:**
+- CI run status on every push and pull request
+- Sprint-end test status (31-Oct and 07-Nov)
+- Final Test Summary Report before the presentation
 
 ## 15. Approvals
-| Role | Name | Signature/date |
+
+| Role | Name | Signature / Date |
 |---|---|---|
-| Test coordinator | To be assigned | Pending |
-| Development lead | To be assigned | Pending |
-| Project guide/evaluator | To be assigned | Pending |
+| QA Lead | J Karthik | |
+| Dev Lead | Nivas Reddy D | |
+| Product Owner | G Sai Hemanth | |
