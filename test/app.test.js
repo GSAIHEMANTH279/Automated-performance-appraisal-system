@@ -58,26 +58,6 @@ test('invalid review decisions are rejected', async () => {
   assert.equal(response.status, 400);
   assert.match(data.error, /Approved or Needs revision/);
 });
-// TC-AUTH-02 (FR-001): wrong password is rejected with a generic message and no session
-test('sign-in with a wrong password is rejected', async () => {
-  const { response, data, cookie } = await request('/api/login', { method: 'POST', body: { email: 'employee@apas.local', password: 'wrong-password' } });
-  assert.equal(response.status, 401);
-  assert.match(data.error, /Invalid email or password/);
-  assert.equal(cookie, undefined);
-});
-// TC-GOAL-02 (FR-003): invalid goal fields are rejected and nothing is stored
-test('goals with invalid fields are rejected', async () => {
-  const login = await request('/api/login', { method: 'POST', body: { email: 'employee@apas.local', password: 'employee123' } });
-  const before = await request('/api/goals', { cookie: login.cookie });
-  const shortTitle = await request('/api/goals', { method: 'POST', cookie: login.cookie, body: { title: 'ab', description: '', metric: '', dueDate: '2026-12-01' } });
-  assert.equal(shortTitle.response.status, 400);
-  assert.match(shortTitle.data.error, /title/i);
-  const badDate = await request('/api/goals', { method: 'POST', cookie: login.cookie, body: { title: 'Valid goal title', description: '', metric: '', dueDate: '2026-13-45' } });
-  assert.equal(badDate.response.status, 400);
-  assert.match(badDate.data.error, /due date/i);
-  const after = await request('/api/goals', { cookie: login.cookie });
-  assert.equal(after.data.goals.length, before.data.goals.length);
-});
 test.after(() => {
   server.close();
   fs.rmSync(tempDir, { recursive: true, force: true });

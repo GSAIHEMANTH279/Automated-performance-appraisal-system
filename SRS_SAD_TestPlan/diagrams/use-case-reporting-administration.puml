@@ -21,6 +21,7 @@ HR --> U4
 HR --> U6
 HR --> U7
 Manager --> U3
+Manager --> U4
 Employee --> U5
 U1 .> U9 : <<include>>
 U2 .> U9 : <<include>>

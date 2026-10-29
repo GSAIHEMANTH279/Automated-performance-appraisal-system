@@ -1,28 +1,23 @@
 flowchart LR
-  HR["👤 HR Administrator"]
-  Manager["👤 Manager"]
-  Employee["👤 Employee"]
-  subgraph APAS["Automated Performance Appraisal System"]
-    U1([Configure appraisal cycle])
-    U2([Configure criteria and weights])
-    U3([View team appraisal status])
-    U4([Generate ranking report])
-    U5([View released personal result])
-    U6([View audit history])
-    U7([Reopen finalized appraisal])
-    U8([Enter reopening reason])
-    U9([Check role permission])
-  end
-  HR --- U1
-  HR --- U2
-  HR --- U4
-  HR --- U6
-  HR --- U7
-  Manager --- U3
-  Employee --- U5
-  U1 -. "«include»" .-> U9
-  U2 -. "«include»" .-> U9
-  U4 -. "«include»" .-> U9
-  U6 -. "«include»" .-> U9
-  U7 -. "«include»" .-> U8
-  U7 -. "«include»" .-> U9
+  HR([HR / Admin])
+  Manager([Manager])
+  Employee([Employee])
+  Cycle((Configure appraisal cycle))
+  Policy((Configure criteria and weights))
+  TeamReport((View team report))
+  Ranking((Generate ranking report))
+  Audit((Inspect audit history))
+  Reopen((Reopen appraisal with reason))
+  Results((View released result))
+  HR --> Cycle
+  HR --> Policy
+  HR --> Ranking
+  HR --> Audit
+  HR --> Reopen
+  Manager --> TeamReport
+  Manager --> Audit
+  Employee --> Results
+  Cycle -. planned .-> Policy
+  Policy -. planned .-> Ranking
+  Reopen -. planned .-> Audit
+  Ranking -. planned .-> Results

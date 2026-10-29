@@ -2,7 +2,7 @@
 
 A Software Engineering mini-project prototype for employee goal submission, manager review, and HR audit visibility.
 
-> **Current implementation:** the `main` branch contains a runnable Node.js/Express MVP. It supports demo sign-in, employee goal submission, manager/HR approval or return for revision, role-protected API routes, and an HR audit view. This is not yet the complete year-end appraisal product: scoring formulas, appraisal-cycle configuration, self-assessment, reporting/ranking, persistent production database, deployment, and final instructor approval remain future work. Sprint 2 (2–7 Nov 2026) adds these features — see the [sprint backlog](PROJECT_EXECUTION_PLAN.md).
+> **Current implementation:** the `main` branch contains a runnable Node.js/Express MVP. It supports demo sign-in, employee goal submission, manager/HR approval or return for revision, role-protected API routes, and an HR audit view. This is not yet the complete year-end appraisal product: scoring formulas, appraisal-cycle configuration, self-assessment, reporting/ranking, persistent production database, deployment, and final instructor approval remain future work. The SRS, SAD and Test Plan were reorganized against the supplied course templates on 28 October 2026; they remain drafts pending a final guide review.
 
 ## Run locally
 
@@ -42,25 +42,7 @@ Run the syntax checks and automated API tests:
 npm run check
 ```
 
-## CI/CD pipeline
-
-The `CI/CD Pipeline` GitHub Actions workflow (`.github/workflows/app-ci.yml`) runs three stages on every pull request to `main` and every push to `main`:
-
-| Stage | What it does |
-|---|---|
-| **Build** | Installs dependencies and checks JavaScript syntax |
-| **Test** | Runs the automated API tests (`npm test`) |
-| **Deploy** | Builds the Docker image and smoke-tests `/api/health` in a running container; on `main` it publishes the image to GitHub Container Registry as `ghcr.io/gsaihemanth279/automated-performance-appraisal-system:latest` (plus a `sha-` tag) |
-
-Each stage runs only if the previous one passed. A separate documentation-check workflow validates the project documents when they change.
-
-### Run the published image
-
-```bash
-docker run -p 3000:3000 ghcr.io/gsaihemanth279/automated-performance-appraisal-system:latest
-```
-
-Then open http://localhost:3000. Demo data lives inside the container and resets when it is removed.
+The `App CI` GitHub Actions workflow installs dependencies, checks JavaScript syntax, and runs tests on pushes to `main` and `chore/strengthen-project-workflow`, and on pull requests targeting `main`. A separate documentation-check workflow validates project documentation when relevant files change. CI passing is evidence for these checks only; it is not a deployment or production-readiness claim.
 
 ## Contributor pull-request workflow
 
@@ -85,18 +67,20 @@ The JSON-file storage and in-memory sessions are suitable only for a single-proc
 
 ## Planned next increments
 
-Sprint 2 Jira stories (owners and story points mirrored in [PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md)):
-- APAS-14 appraisal cycles · APAS-10 self-assessment · APAS-11 manager rating
-- APAS-12 score calculation · APAS-13 HR finalization and ranking · APAS-16 audit trail
-- APAS-15 assigned-manager access control · APAS-18 CI/CD deploy stage · APAS-20 final demo
+- Confirm scoring formula, rating scale, missing-rating handling, and ranking/tie policy with the team and instructor.
+- Replace local JSON storage with a database and add migrations.
+- Add appraisal-cycle configuration, progress updates, employee self-assessment, manager ratings, HR finalization, and authorized result release.
+- Add deeper validation, CSRF protections as needed for the chosen deployment, dependency/security checks, and integration tests.
+- Complete the guide's final review of the SRS, SAD, and Test Plan formatting and approval fields before submission.
 
 ## Project documents
 
-- [SRS](SRS_SAD_TestPlan/SRS.md) – requirements, scoring policy, use-case diagrams, RTM
-- [SAD](SRS_SAD_TestPlan/SAD.md) – architecture, UML class and sequence diagrams, API design
-- [Test Plan](SRS_SAD_TestPlan/Test_Plan.md) – strategy and full test case list
-- [Requirements traceability matrix (CSV)](SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)
-- [Project execution plan, sprint backlog and deviation log](PROJECT_EXECUTION_PLAN.md)
+- [SRS](SRS_SAD_TestPlan/SRS.md)
+- [SAD](SRS_SAD_TestPlan/SAD.md)
+- [Test Plan](SRS_SAD_TestPlan/Test_Plan.md)
+- [Requirements traceability matrix](SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)
+
+These documents remain drafts until reviewed against the course-provided templates.
 
 ## Team
 

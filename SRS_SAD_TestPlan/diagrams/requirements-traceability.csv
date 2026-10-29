@@ -1,26 +1,11 @@
 Requirement ID,Feature area,Test IDs,Planned evidence,Status
-FR-001,Sign-in and role access,TC-AUTH-01;TC-AUTH-02;TC-AUTH-03,API tests in CI,A
-FR-002,Appraisal cycle creation,TC-CYCLE-01;TC-CYCLE-02,API tests in CI,N
-FR-003,Goal submission,TC-GOAL-01;TC-GOAL-02,API tests in CI,P
-FR-004,Goal approval / return by assigned manager,TC-GOAL-03;TC-GOAL-04,API tests in CI,P
-FR-005,Goal progress updates,TC-GOAL-05,API tests in CI,N
-FR-006,Role dashboard,TC-DASH-01,Manual UI check,P
-FR-007,Employee self-assessment,TC-APP-01;TC-APP-02,API tests in CI,N
-FR-008,Manager rating,TC-APP-03,API tests in CI,N
-FR-009,Score calculation,TC-SCORE-01;TC-SCORE-02,Unit tests with fixtures,N
-FR-010,Ranking and tie rule,TC-SCORE-03;TC-SCORE-04;TC-SCORE-05,Unit tests with fixtures,N
-FR-011,HR finalize and release,TC-REL-01;TC-REL-02,API tests in CI,N
-FR-012,Appraisal history,TC-HIST-01,API tests in CI,N
-FR-013,Cycle report,TC-REP-01,API tests in CI,N
-FR-014,Audit events,TC-AUD-01,API tests in CI,P
-FR-015,Reopen with reason,TC-REL-03,API tests in CI,N
-NFR-001,Response time,TC-PERF-01,Load test report,N
-NFR-002,No partial finalization,TC-REL-04,API tests in CI,N
-NFR-003,Record-level privacy,TC-SEC-01;TC-GOAL-04,API tests in CI,P
-NFR-004,Reproducible scores,TC-SCORE-06,Unit tests with fixtures,N
-NFR-005,Usable forms,TC-UX-01,Manual usability checklist,P
-SR-001,HTTPS in deployment,TC-SEC-02,Deployment check,N
-SR-002,Hashed passwords,TC-SEC-03,Data file inspection,P
-SR-003,Server-side authorization,TC-SEC-01,API tests in CI,P
-SR-004,Input validation,TC-SEC-04,API tests in CI,P
-SR-005,Immutable audit log,TC-AUD-02,API tests in CI,P
+FR-001;SR-002;SR-003,Authentication and role access,TC-AUTH-01;TC-AUTH-02;TC-AUTH-03,API tests and CI run,Partial; MVP automated tests exist
+FR-002,Appraisal cycle configuration,TC-CYCLE-01;TC-CYCLE-02,Automated tests and UI/API evidence,Planned; not implemented
+FR-003;FR-004,Goal submission and manager review,TC-GOAL-01;TC-GOAL-02;TC-GOAL-03;TC-GOAL-04,Feature tests and authorization checks,Partial; assigned-manager restriction remains
+FR-005;FR-006,Progress updates and dashboards,TC-GOAL-05;TC-DASH-01,Automated tests and demo evidence,Planned; not implemented
+FR-007;FR-008,Self and manager assessment,TC-APP-01;TC-APP-02;TC-APP-03,Automated tests and demo evidence,Planned; not implemented
+FR-009;FR-010,Score calculation and ranking,TC-SCORE-01;TC-SCORE-02;TC-SCORE-03;TC-SCORE-04;TC-SCORE-05,Independent scoring fixtures and test report,Planned; policy not approved
+FR-011;FR-015,Finalization and reopening,TC-REL-01;TC-REL-02;TC-REL-03,Role checks and audit evidence,Planned; not implemented
+FR-014;SR-005,Audit events,TC-AUD-01;TC-AUD-02,API tests and event inspection,Partial; current demo actions logged
+NFR-001,Performance,TC-PERF-01,Load test report with environment and p95 latency,Not measured
+SR-001;SR-004,Transport and input security,TC-SEC-01;TC-SEC-04,Deployment verification and negative tests,Partial/planned; production TLS not configured

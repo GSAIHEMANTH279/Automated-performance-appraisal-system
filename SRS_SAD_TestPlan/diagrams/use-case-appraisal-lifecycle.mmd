@@ -1,31 +1,26 @@
 flowchart LR
-  Employee["👤 Employee"]
-  Manager["👤 Manager"]
-  HR["👤 HR Administrator"]
-  subgraph APAS["Automated Performance Appraisal System"]
-    UC1([Sign in])
-    UC2([Create / submit goal])
-    UC3([Update goal progress])
-    UC4([Submit self-assessment])
-    UC5([Review / return goal])
-    UC6([Rate employee goals])
-    UC7([Validate required ratings])
-    UC8([Calculate final score])
-    UC9([Finalize appraisal])
-    UC10([Release results])
-    UC11([Record audit event])
-  end
-  Employee --- UC1
-  Employee --- UC2
-  Employee --- UC3
-  Employee --- UC4
-  Manager --- UC1
-  Manager --- UC5
-  Manager --- UC6
-  HR --- UC1
-  HR --- UC9
-  HR --- UC10
-  UC6 -. "«include»" .-> UC7
-  UC9 -. "«include»" .-> UC8
-  UC5 -. "«include»" .-> UC11
-  UC9 -. "«include»" .-> UC11
+  Employee([Employee])
+  Manager([Manager])
+  HR([HR / Admin])
+  Goal((Submit goal))
+  Review((Review / return goal))
+  Progress((Update progress))
+  Self((Submit self-assessment))
+  Rate((Assess employee))
+  Score((Calculate score))
+  Finalize((Finalize results))
+  Release((Release results))
+  Employee --> Goal
+  Employee --> Progress
+  Employee --> Self
+  Manager --> Review
+  Manager --> Rate
+  HR --> Review
+  HR --> Score
+  HR --> Finalize
+  HR --> Release
+  Goal -. planned .-> Progress
+  Self -. planned .-> Rate
+  Rate -. planned .-> Score
+  Score -. planned .-> Finalize
+  Finalize -. planned .-> Release
