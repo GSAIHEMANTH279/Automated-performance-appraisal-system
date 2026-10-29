@@ -109,7 +109,7 @@ A **layered monolith** (presentation → API → services → data store) runnin
 |---|---|---|
 | UI | HTML, CSS, vanilla JavaScript | Served as static files by Express |
 | Server/API | Node.js 20+, Express 4 | JSON REST API |
-| Data store | JSON file (`data/store.json`) | Demo only; database planned (APAS-20) |
+| Data store | JSON file (`data/store.json`) | Demo only; database planned (future work) |
 | Security | Node `crypto` scrypt, HttpOnly SameSite cookie, CSP and security headers | Secure cookie flag in production |
 | Testing | Node built-in test runner + fetch | `npm run check` |
 | CI | GitHub Actions (Node 22) | Runs on every push and PR |
@@ -120,8 +120,8 @@ A **layered monolith** (presentation → API → services → data store) runnin
 |---|---|
 | JSON file corruption from concurrent writes | Atomic temp-file rename now; move to a transactional database before multi-user use |
 | Sessions lost on server restart | Acceptable for demo; persistent session store before deployment |
-| Manager reviews an employee they don't manage | Add `managerId` to users and record-level check (APAS-15) |
-| Scoring policy disputed | Versioned policy stored with each result; team approval (APAS-02) |
+| Manager reviews an employee they don't manage | Add `managerId` to users and record-level check (Jira APAS-15) |
+| Scoring policy disputed | Versioned policy stored with each result; team approval (Jira APAS-12) |
 | Docs drift from code | Update SRS/SAD/Test Plan in the same PR as code changes |
 
 ### 3.8 Traceability to Requirements
@@ -244,11 +244,11 @@ All errors return JSON `{error: "<user-friendly message>"}` with the correct HTT
 Single-page layout with a sign-in card, role badge, and role-specific panels: employee goal form with inline validation and status pills; manager review queue with Approve / Return buttons and a comment box; HR audit list. Responsive down to 360 px; status shown by text as well as colour.
 
 ### 4.6 Open Issues & Next Steps
-1. Approve scoring policy v1 (APAS-02).
-2. Add manager–employee assignment and record-level checks (APAS-15).
-3. Implement cycles, progress, assessment, scoring, ranking and reports (APAS-08 to APAS-12, APAS-16).
-4. Add a deploy stage to the CI/CD pipeline (APAS-13).
-5. Replace the JSON store with a database (APAS-20).
+1. Approve scoring policy v1 (Jira APAS-12).
+2. Add manager–employee assignment and record-level checks (Jira APAS-15).
+3. Implement cycles, progress, assessment, scoring, ranking and reports (Jira APAS-9 to APAS-14).
+4. Add a deploy stage to the CI/CD pipeline (Jira APAS-18).
+5. Replace the JSON store with a database (future work).
 
 ## 5. Appendices
 

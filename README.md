@@ -67,10 +67,10 @@ The JSON-file storage and in-memory sessions are suitable only for a single-proc
 
 ## Planned next increments
 
-Sprint 2 stories (owners and story points in [PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md)):
-- APAS-16 appraisal cycles · APAS-08 progress and self-assessment · APAS-09 manager rating
-- APAS-10 score calculation · APAS-11 HR finalization and ranking · APAS-12 reports and history
-- APAS-15 assigned-manager authorization · APAS-13 CI/CD deploy stage · APAS-14 final demo
+Sprint 2 Jira stories (owners and story points mirrored in [PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md)):
+- APAS-14 appraisal cycles · APAS-10 self-assessment · APAS-11 manager rating
+- APAS-12 score calculation · APAS-13 HR finalization and ranking · APAS-16 audit trail
+- APAS-15 assigned-manager access control · APAS-18 CI/CD deploy stage · APAS-20 final demo
 
 ## Project documents
 
