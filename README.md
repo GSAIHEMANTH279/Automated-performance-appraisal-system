@@ -42,7 +42,25 @@ Run the syntax checks and automated API tests:
 npm run check
 ```
 
-The `App CI` GitHub Actions workflow installs dependencies, checks JavaScript syntax, and runs tests on pushes to `main` and `chore/strengthen-project-workflow`, and on pull requests targeting `main`. A separate documentation-check workflow validates project documentation when relevant files change. CI passing is evidence for these checks only; it is not a deployment or production-readiness claim.
+## CI/CD pipeline
+
+The `CI/CD Pipeline` GitHub Actions workflow (`.github/workflows/app-ci.yml`) runs three stages on every pull request to `main` and every push to `main`:
+
+| Stage | What it does |
+|---|---|
+| **Build** | Installs dependencies and checks JavaScript syntax |
+| **Test** | Runs the automated API tests (`npm test`) |
+| **Deploy** | Builds the Docker image and smoke-tests `/api/health` in a running container; on `main` it publishes the image to GitHub Container Registry as `ghcr.io/gsaihemanth279/automated-performance-appraisal-system:latest` (plus a `sha-` tag) |
+
+Each stage runs only if the previous one passed. A separate documentation-check workflow validates the project documents when they change.
+
+### Run the published image
+
+```bash
+docker run -p 3000:3000 ghcr.io/gsaihemanth279/automated-performance-appraisal-system:latest
+```
+
+Then open http://localhost:3000. Demo data lives inside the container and resets when it is removed.
 
 ## Contributor pull-request workflow
 
