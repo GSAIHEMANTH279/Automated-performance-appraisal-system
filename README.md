@@ -42,7 +42,18 @@ Run the syntax checks and automated API tests:
 npm run check
 ```
 
-The `App CI` GitHub Actions workflow installs dependencies, checks JavaScript syntax, and runs tests on pushes to `main` or the `chore/strengthen-project-workflow` branch, and on pull requests targeting `main`. A separate documentation-check workflow validates project documentation. CI passing is evidence for these checks only; it is not a deployment or production-readiness claim.
+The `App CI` GitHub Actions workflow installs dependencies, checks JavaScript syntax, and runs tests on pushes to `main` and `chore/strengthen-project-workflow`, and on pull requests targeting `main`. A separate documentation-check workflow validates project documentation when relevant files change. CI passing is evidence for these checks only; it is not a deployment or production-readiness claim.
+
+## Contributor pull-request workflow
+
+1. Create a feature branch from the latest `main`.
+2. Make a focused change and run `npm run check` locally.
+3. Push the feature branch and open a pull request targeting `main`.
+4. Wait for the applicable GitHub Actions checks to pass and request a teammate review.
+5. Address review feedback, then merge after approval and successful checks.
+6. Update the local `main` branch after the pull request is merged.
+
+The workflow should be demonstrated with a real project change; never treat a green CI result alone as proof that a change has been reviewed or deployed.
 
 ## Scope and architecture
 
