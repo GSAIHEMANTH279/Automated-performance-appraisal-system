@@ -157,13 +157,13 @@ Status as of 29-Oct-2026: **Pass** = automated test passing in CI; **Not run** =
 |---|---|---|---|---|---|
 | TC-SMOKE-01 | – | `GET /api/health` | 200, `status: ok` | Automated | Pass |
 | TC-AUTH-01 | FR-001 | Sign in with valid employee credentials | 200, user role returned, session cookie set | Automated | Pass |
-| TC-AUTH-02 | FR-001 | Sign in with wrong password | 401, generic error message | Automated | Not run |
+| TC-AUTH-02 | FR-001 | Sign in with wrong password | 401, generic error message | Automated | Pass |
 | TC-AUTH-03 | FR-001 | Call `GET /api/goals` without a session | 401 | Automated | Pass |
 | TC-CYCLE-01 | FR-002 | HR creates cycle with valid dates | 201, cycle stored as Open | Automated | Planned |
 | TC-CYCLE-02 | FR-002 | End date before start date; employee tries to create cycle | 400; 403 | Automated | Planned |
 | TC-DASH-01 | FR-006 | Each role opens dashboard | Only permitted records and correct counts shown | Manual | Not run |
 | TC-GOAL-01 | FR-003 | Employee submits valid goal | 201, status Submitted | Automated | Pass |
-| TC-GOAL-02 | FR-003 | Submit goal with 2-character title / invalid date | 400 with clear message | Automated | Not run |
+| TC-GOAL-02 | FR-003 | Submit goal with 2-character title / invalid date | 400 with clear message | Automated | Pass |
 | TC-GOAL-03 | FR-004 | Manager approves a submitted goal | 200, status Approved, comment saved | Automated | Pass |
 | TC-GOAL-04 | FR-004, NFR-003 | Manager reviews a goal of an employee they don't manage | 403, goal unchanged | Automated | Blocked (APAS-15) |
 | TC-GOAL-05 | FR-005 | Employee adds progress update to approved goal | 201, timestamp stored | Automated | Planned |
@@ -191,17 +191,19 @@ Status as of 29-Oct-2026: **Pass** = automated test passing in CI; **Not run** =
 | TC-PERF-01 | NFR-001 | 20 concurrent users read `/api/goals` for 60 s | p95 ≤ 3 s | Tool | Planned |
 | TC-UX-01 | NFR-005 | Submit empty form; use at 360 px width; double-click final action | Clear message; usable layout; single record | Manual | Not run |
 
-**Automated test mapping (`test/app.test.js`, 5 tests passing on 29-Oct-2026):**
+**Automated test mapping (`test/app.test.js`, 7 tests passing on 29-Oct-2026):**
 - "health endpoint reports ready" → TC-SMOKE-01
 - "private routes reject anonymous requests" → TC-AUTH-03
 - "employee can sign in and submit a goal, but cannot review it" → TC-AUTH-01, TC-GOAL-01, TC-SEC-01
 - "manager can approve a submitted goal and HR can read audit events" → TC-GOAL-03, TC-AUD-01
 - "invalid review decisions are rejected" → TC-SEC-04 (invalid decision case)
+- "sign-in with a wrong password is rejected" → TC-AUTH-02
+- "goals with invalid fields are rejected" → TC-GOAL-02
 
 ## 14. Test Metrics & Reporting
 
 **Metrics collected:**
-- % test cases executed (current: 8 of 35 executed, all passing)
+- % test cases executed (current: 10 of 35 executed, all passing)
 - % passed / failed
 - Defect density (defects per feature)
 - Defect aging (days open)

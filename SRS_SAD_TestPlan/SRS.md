@@ -221,7 +221,7 @@ Comments cite Jira issue keys (project APAS). Status key: **N** = not started, *
 
 | Req ID | Requirement short | Section ref / Design Spec | Module | Test case(s) | Status (N/P/A) | Comments |
 |---|---|---|---|---|---|---|
-| FR-001 | Sign in & role access | 4.1 / SAD 3.4 Auth | Auth middleware (`server.js`) | TC-AUTH-01, 02, 03 | P | Login and role checks implemented; TC-AUTH-02 not automated yet |
+| FR-001 | Sign in & role access | 4.1 / SAD 3.4 Auth | Auth middleware (`server.js`) | TC-AUTH-01, 02, 03 | A | All three automated tests pass in CI |
 | FR-002 | Create appraisal cycle | 4.2 / SAD 3.4 Cycle | Cycle service | TC-CYCLE-01, 02 | N | Sprint 2 (APAS-14) |
 | FR-003 | Submit goal | 4.3 / SAD 4.4 API A | Goal service | TC-GOAL-01, 02 | P | Weight field to be added |
 | FR-004 | Approve / return goal | 4.3 / SAD 4.4 API B | Goal service | TC-GOAL-03, 04 | P | Assigned-manager check pending (APAS-15) |
