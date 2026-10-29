@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log*
+data/store.json*
+.git
+.github
+test
+SRS_SAD_TestPlan
+*.md
+.env
+.env.*
