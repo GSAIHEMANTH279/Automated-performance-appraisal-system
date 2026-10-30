@@ -90,10 +90,12 @@ $('#login-form').addEventListener('submit', async event => {
 });
 $('#goal-form').addEventListener('submit', async event => {
   event.preventDefault();
-  const data = new FormData(event.currentTarget);
+  // currentTarget is null after the await, so keep the form reference.
+  const form = event.currentTarget;
+  const data = new FormData(form);
   try {
     await api('/api/goals', { method: 'POST', body: JSON.stringify(Object.fromEntries(data.entries())) });
-    event.currentTarget.reset();
+    form.reset();
     $('#goal-message').textContent = 'Goal submitted successfully.';
     await refreshWorkspace();
   } catch (error) { $('#goal-message').textContent = error.message; }
