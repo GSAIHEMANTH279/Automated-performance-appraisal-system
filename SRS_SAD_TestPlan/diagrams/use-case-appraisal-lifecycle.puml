@@ -31,6 +31,4 @@ UC6 .> UC7 : <<include>>
 UC9 .> UC8 : <<include>>
 UC5 .> UC11 : <<include>>
 UC9 .> UC11 : <<include>>
-UC10 .> UC9 : <<extend>>
-[cycle approved for release]
 @enduml
