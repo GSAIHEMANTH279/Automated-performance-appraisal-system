@@ -42,7 +42,7 @@ function renderGoals(goals) {
   }
   $('#goals-list').innerHTML = goals.map(goal => `
     <article class="goal-card">
-      <div class="goal-main"><div class="goal-topline"><span class="pill ${statusClass(goal.status)}">${esc(goal.status)}</span><span class="muted small">Due ${esc(goal.dueDate)}</span></div>
+      <div class="goal-main"><div class="goal-topline"><span class="pill ${statusClass(goal.status)}">${esc(goal.status)}</span><span class="muted small">Due ${esc(goal.dueDate)} · Weight ${esc(goal.weight ?? '')}</span></div>
       <h3>${esc(goal.title)}</h3><p class="goal-description">${esc(goal.description || 'No description added.')}</p>
       <div class="metric"><span>SUCCESS METRIC</span><p>${esc(goal.metric || 'Not specified')}</p></div>
       ${currentUser.role !== 'employee' ? `<p class="owner-line">Submitted by <b>${esc(goal.employee?.name || 'Employee')}</b></p>` : ''}
@@ -77,6 +77,7 @@ async function refreshWorkspace() {
     const { events } = await api('/api/audit');
     $('#audit-list').innerHTML = events.slice(0, 12).map(event => `<div class="audit-row"><span class="audit-dot"></span><div><b>${esc(event.action.replaceAll('_',' ').toLowerCase())}</b><p>${esc(event.actorName)} · ${new Date(event.at).toLocaleString()}</p></div></div>`).join('') || '<p class="muted">No audit events yet.</p>';
   }
+  for (const feature of window.APAS.features) await feature.refresh(currentUser);
 }
 $('#login-form').addEventListener('submit', async event => {
   event.preventDefault();
@@ -104,10 +105,12 @@ $('#logout-button').addEventListener('click', async () => {
   try { await api('/api/logout', { method: 'POST', body: '{}' }); } finally { showLoggedOut(); }
 });
 $('#refresh-button').addEventListener('click', () => refreshWorkspace().then(() => showToast('Workspace refreshed.')).catch(error => showToast(error.message)));
-(async () => {
+// Feature modules (cycles.js, assessments.js, ...) register here and are refreshed with the workspace.
+window.APAS = { features: [], api, esc, showToast, user: () => currentUser, refresh: () => refreshWorkspace() };
+document.addEventListener('DOMContentLoaded', async () => {
   try {
     const { user } = await api('/api/me');
     showLoggedIn(user);
     await refreshWorkspace();
   } catch { showLoggedOut(); }
-})();
+});

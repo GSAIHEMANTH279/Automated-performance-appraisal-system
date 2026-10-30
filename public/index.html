@@ -7,6 +7,7 @@
   <title>APAS · Performance Appraisal</title>
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
+  <script src="/cycles.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -35,17 +36,28 @@
       </form>
     </section>
     <section id="app-view" class="hidden">
-      <div class="page-heading"><div><p class="eyebrow">WORKSPACE</p><h1 id="welcome-title">Your appraisal workspace</h1><p id="welcome-copy" class="muted">Track goals and decisions.</p></div><button id="refresh-button" class="button button-secondary">↻ Refresh</button></div>
+      <div class="page-heading"><div><p class="eyebrow">WORKSPACE</p><h1 id="welcome-title">Your appraisal workspace</h1><p id="welcome-copy" class="muted">Track goals and decisions.</p><p id="cycle-banner" class="cycle-banner hidden"></p></div><button id="refresh-button" class="button button-secondary">↻ Refresh</button></div>
       <div id="stats" class="stats-grid"></div>
       <section id="employee-tools" class="panel hidden">
         <div class="section-heading"><div><p class="eyebrow">NEW OBJECTIVE</p><h2>Submit a goal</h2></div><span class="pill">Employee</span></div>
         <form id="goal-form" class="goal-form">
           <label>Goal title<input name="title" required minlength="3" maxlength="120" placeholder="e.g. Complete the cloud certification"></label>
           <label>Due date<input name="dueDate" type="date" required></label>
+          <label>Weight (importance 1–100)<input name="weight" type="number" min="1" max="100" step="1" value="10" required></label>
           <label class="wide">Description<textarea name="description" rows="3" maxlength="1000" placeholder="What will you work on?"></textarea></label>
           <label class="wide">Success metric<input name="metric" maxlength="200" placeholder="How will success be measured?"></label>
           <div class="wide form-footer"><span class="muted small">Submitted goals are visible to managers for review.</span><button class="button button-primary" type="submit">Submit goal →</button></div>
         </form><p id="goal-message" class="notice" role="status"></p>
+      </section>
+      <section id="cycles-section" class="panel hidden">
+        <div class="section-heading"><div><p class="eyebrow">APPRAISAL CYCLES</p><h2>Appraisal cycles</h2></div><span class="pill">HR</span></div>
+        <form id="cycle-form" class="goal-form">
+          <label class="wide">Cycle name<input name="name" required minlength="3" maxlength="80" placeholder="e.g. FY 2027"></label>
+          <label>Start date<input name="startDate" type="date" required></label>
+          <label>End date<input name="endDate" type="date" required></label>
+          <div class="wide form-footer"><span class="muted small">Only one cycle can be open at a time.</span><button class="button button-primary" type="submit">Start cycle →</button></div>
+        </form>
+        <div id="cycles-list" class="cycles-list"></div>
       </section>
       <section class="content-section"><div class="section-heading"><div><p class="eyebrow">GOAL PIPELINE</p><h2 id="goals-heading">Goals</h2></div><span id="goal-count" class="muted small"></span></div><div id="goals-list" class="goals-list"></div></section>
       <section id="audit-section" class="content-section hidden"><div class="section-heading"><div><p class="eyebrow">ACCOUNTABILITY</p><h2>Recent audit events</h2></div></div><div id="audit-list" class="audit-list"></div></section>
