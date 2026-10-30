@@ -1,0 +1,90 @@
+classDiagram
+  direction TB
+  class User {
+    +String id
+    +String name
+    +String email
+    +Role role
+    -String passwordHash
+    +String managerId
+  }
+  class Goal {
+    +String id
+    +String employeeId
+    +String cycleId
+    +String title
+    +String description
+    +String metric
+    +Date dueDate
+    +Integer weight
+    +GoalStatus status
+    +String managerComment
+    +submit()
+    +review(status, comment)
+  }
+  class AuditEvent {
+    +String id
+    +String actorId
+    +String action
+    +String targetId
+    +DateTime at
+  }
+  class Session {
+    +String token
+    +String userId
+    +Integer maxAgeSeconds
+  }
+  class AppraisalCycle {
+    <<planned>>
+    +String id
+    +String name
+    +Date startDate
+    +Date endDate
+    +CycleStatus status
+    +open()
+    +close()
+  }
+  class ProgressUpdate {
+    <<planned>>
+    +String goalId
+    +String note
+    +Integer percentComplete
+    +DateTime at
+  }
+  class Assessment {
+    <<planned>>
+    +String employeeId
+    +String cycleId
+    +Map selfRatings
+    +Map managerRatings
+    +AssessmentStatus status
+    +submitSelf()
+    +submitManager()
+  }
+  class ScoringPolicy {
+    <<planned>>
+    +String version
+    +Float selfWeight
+    +Float managerWeight
+    +calculate(assessment, goals) Float
+  }
+  class AppraisalResult {
+    <<planned>>
+    +String employeeId
+    +String cycleId
+    +Float finalScore
+    +String ratingBand
+    +Integer rank
+    +String policyVersion
+    +finalize()
+    +release()
+  }
+  User "1" --> "0..*" Goal : owns
+  User "1" --> "0..*" User : manages
+  User "1" --> "0..*" AuditEvent : performs
+  User "1" --> "0..*" Session : holds
+  AppraisalCycle "1" --> "0..*" Goal : contains
+  Goal "1" --> "0..*" ProgressUpdate : tracks
+  AppraisalCycle "1" --> "0..*" Assessment : includes
+  Assessment "1" --> "0..1" AppraisalResult : produces
+  ScoringPolicy "1" --> "0..*" AppraisalResult : scores
