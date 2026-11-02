@@ -34,6 +34,16 @@ function showLoggedIn(user) {
 function statusClass(status) {
   return status === 'Approved' ? 'approved' : status === 'Needs revision' ? 'revision' : 'submitted';
 }
+function progressBlock(goal) {
+  const updates = goal.progress || [];
+  const latest = updates.length ? updates[updates.length - 1].percent : 0;
+  const history = updates.slice(-3).reverse().map(update => `<li><b>${esc(update.percent)}%</b> ${esc(update.note)} <span class="muted small">${new Date(update.at).toLocaleDateString()}</span></li>`).join('');
+  const canUpdate = currentUser.role === 'employee' && goal.status === 'Approved';
+  if (!updates.length && !canUpdate) return '';
+  return `<div class="progress-block"><div class="progress-head"><span>PROGRESS</span><b>${esc(latest)}%</b></div><progress max="100" value="${esc(latest)}"></progress>
+    ${history ? `<ul class="progress-history">${history}</ul>` : ''}
+    ${canUpdate ? `<form class="progress-form" data-goal-id="${esc(goal.id)}"><input name="note" required maxlength="500" placeholder="What did you complete?"><input name="percent" type="number" min="0" max="100" step="1" required value="${esc(latest)}" aria-label="Percent complete"><button class="button button-secondary" type="submit">Add update</button></form>` : ''}</div>`;
+}
 function renderGoals(goals) {
   $('#goal-count').textContent = `${goals.length} goal${goals.length === 1 ? '' : 's'}`;
   if (!goals.length) {
@@ -47,10 +57,20 @@ function renderGoals(goals) {
       <div class="metric"><span>SUCCESS METRIC</span><p>${esc(goal.metric || 'Not specified')}</p></div>
       ${currentUser.role !== 'employee' ? `<p class="owner-line">Submitted by <b>${esc(goal.employee?.name || 'Employee')}</b></p>` : ''}
       ${goal.managerComment ? `<div class="review-note"><b>Review note</b><p>${esc(goal.managerComment)}</p></div>` : ''}
+      ${progressBlock(goal)}
       </div>
       ${['manager','hr'].includes(currentUser.role) && ['Submitted','Needs revision'].includes(goal.status) ? `
         <form class="review-form" data-goal-id="${esc(goal.id)}"><label>Feedback<textarea name="comment" rows="2" maxlength="1000" placeholder="Add helpful feedback (optional)">${esc(goal.managerComment || '')}</textarea></label><div class="review-actions"><button class="button button-secondary" name="status" value="Needs revision" type="submit">Return</button><button class="button button-primary" name="status" value="Approved" type="submit">Approve</button></div></form>` : ''}
     </article>`).join('');
+  document.querySelectorAll('.progress-form').forEach(form => form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const data = new FormData(form);
+    try {
+      await api(`/api/goals/${encodeURIComponent(form.dataset.goalId)}/progress`, { method: 'POST', body: JSON.stringify({ note: data.get('note'), percent: Number(data.get('percent')) }) });
+      showToast('Progress update saved.');
+      await refreshWorkspace();
+    } catch (error) { showToast(error.message); }
+  }));
   document.querySelectorAll('.review-form').forEach(form => form.addEventListener('submit', async event => {
     event.preventDefault();
     const status = event.submitter.value;
