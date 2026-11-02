@@ -20,19 +20,49 @@ function passwordMatches(password, stored) {
   const expectedBuffer = Buffer.from(expected, 'hex');
   return actual.length === expectedBuffer.length && crypto.timingSafeEqual(actual, expectedBuffer);
 }
+const DEFAULT_CYCLE_ID = 'c-fy2026';
+const DEFAULT_WEIGHT = 10;
+function defaultCycle(now) {
+  return { id: DEFAULT_CYCLE_ID, name: 'FY 2026', startDate: '2026-04-01', endDate: '2027-03-31', status: 'Open', createdAt: now };
+}
 function initialStore() {
   const now = new Date().toISOString();
+  const employee = (id, name, email) => ({ id, name, email, role: 'employee', managerId: 'u-manager', password: passwordHash('employee123') });
+  const goal = (employeeId, title, metric, weight, status, managerComment = '') => ({ id: crypto.randomUUID(), employeeId, cycleId: DEFAULT_CYCLE_ID, title, description: '', metric, dueDate: '2027-03-15', weight, status, managerComment, createdAt: now, updatedAt: now });
   return {
     users: [
-      { id: 'u-employee', name: 'Demo Employee', email: 'employee@apas.local', role: 'employee', password: passwordHash('employee123') },
+      employee('u-employee', 'Demo Employee', 'employee@apas.local'),
       { id: 'u-manager', name: 'Demo Manager', email: 'manager@apas.local', role: 'manager', password: passwordHash('manager123') },
-      { id: 'u-hr', name: 'Demo HR', email: 'hr@apas.local', role: 'hr', password: passwordHash('hr123') }
+      { id: 'u-hr', name: 'Demo HR', email: 'hr@apas.local', role: 'hr', password: passwordHash('hr123') },
+      employee('u-employee2', 'Asha Rao', 'employee2@apas.local'),
+      employee('u-employee3', 'Rahul Menon', 'employee3@apas.local'),
+      employee('u-employee4', 'Priya Shah', 'employee4@apas.local')
     ],
+    cycles: [defaultCycle(now)],
     goals: [
-      { id: crypto.randomUUID(), employeeId: 'u-employee', title: 'Complete assigned learning path', description: 'Finish the agreed learning modules and share key takeaways.', metric: 'All modules completed', dueDate: '2026-12-15', status: 'Submitted', managerComment: '', createdAt: now, updatedAt: now }
+      { ...goal('u-employee', 'Complete assigned learning path', 'All modules completed', DEFAULT_WEIGHT, 'Submitted'), description: 'Finish the agreed learning modules and share key takeaways.', dueDate: '2026-12-15' },
+      goal('u-employee2', 'Reduce the support ticket backlog', 'Backlog under 20 tickets', 60, 'Approved', 'Clear and measurable.'),
+      goal('u-employee2', 'Mentor two new joiners', 'Both complete onboarding', 40, 'Approved'),
+      goal('u-employee3', 'Ship the billing module', 'Released to production', 50, 'Approved'),
+      goal('u-employee3', 'Raise test coverage to 80%', 'Coverage report at 80%', 50, 'Approved'),
+      goal('u-employee4', 'Automate the monthly reports', 'Reports generated without manual steps', 70, 'Approved'),
+      goal('u-employee4', 'Complete security training', 'Certificate earned', 30, 'Approved')
     ],
+    assessments: [],
     audit: [{ id: crypto.randomUUID(), actorId: 'system', action: 'DEMO_DATA_INITIALIZED', targetId: null, at: now }]
   };
+}
+function migrateStore(store) {
+  const now = new Date().toISOString();
+  if (!Array.isArray(store.cycles)) store.cycles = [defaultCycle(now)];
+  if (!Array.isArray(store.assessments)) store.assessments = [];
+  for (const user of store.users) if (user.role === 'employee' && !user.managerId) user.managerId = 'u-manager';
+  const open = store.cycles.find(cycle => cycle.status === 'Open');
+  for (const goal of store.goals) {
+    if (!('cycleId' in goal)) goal.cycleId = open ? open.id : null;
+    if (!goal.weight) goal.weight = DEFAULT_WEIGHT;
+  }
+  return store;
 }
 function ensureStore() {
   fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
@@ -40,7 +70,7 @@ function ensureStore() {
 }
 function readStore() {
   ensureStore();
-  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  return migrateStore(JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')));
 }
 function writeStore(store) {
   fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
@@ -147,9 +177,13 @@ app.post('/api/goals', requireAuth, requireRole('employee'), (req, res) => {
   if (title.length < 3 || title.length > 120) return res.status(400).json({ error: 'Goal title must be 3–120 characters.' });
   if (description.length > 1000 || metric.length > 200) return res.status(400).json({ error: 'Description or success metric is too long.' });
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate) || Number.isNaN(Date.parse(dueDate))) return res.status(400).json({ error: 'Choose a valid due date.' });
+  const rawWeight = req.body?.weight;
+  const weight = rawWeight === undefined || rawWeight === null || rawWeight === '' ? DEFAULT_WEIGHT : Number(rawWeight);
+  if (!Number.isInteger(weight) || weight < 1 || weight > 100) return res.status(400).json({ error: 'Weight must be a whole number from 1 to 100.' });
   const store = readStore();
   const now = new Date().toISOString();
-  const goal = { id: crypto.randomUUID(), employeeId: req.user.id, title, description, metric, dueDate, status: 'Submitted', managerComment: '', createdAt: now, updatedAt: now };
+  const openCycle = store.cycles.find(cycle => cycle.status === 'Open');
+  const goal = { id: crypto.randomUUID(), employeeId: req.user.id, cycleId: openCycle ? openCycle.id : null, title, description, metric, dueDate, weight, status: 'Submitted', managerComment: '', createdAt: now, updatedAt: now };
   store.goals.push(goal);
   audit(store, req.user.id, 'GOAL_SUBMITTED', goal.id);
   writeStore(store);
@@ -176,6 +210,10 @@ app.get('/api/audit', requireAuth, requireRole('hr'), (req, res) => {
   const users = new Map(store.users.map(user => [user.id, user.name]));
   res.json({ events: store.audit.slice().reverse().map(event => ({ ...event, actorName: users.get(event.actorId) || event.actorId })) });
 });
+
+const isIsoDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
+const ctx = { readStore, writeStore, audit, requireAuth, requireRole, safeUser, isIsoDate };
+require('./routes/cycles')(app, ctx);
 
 if (require.main === module) {
   ensureStore();

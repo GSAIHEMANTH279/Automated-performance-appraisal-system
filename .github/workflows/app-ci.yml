@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Check JavaScript syntax
-        run: node --check server.js && node --check public/app.js
+        run: node scripts/check-syntax.js
 
   test:
     name: Test

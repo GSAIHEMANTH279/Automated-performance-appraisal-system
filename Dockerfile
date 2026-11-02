@@ -11,6 +11,7 @@ COPY package.json ./
 RUN npm install --omit=dev --no-audit --no-fund && npm cache clean --force
 
 COPY server.js ./
+COPY routes ./routes
 COPY public ./public
 
 # Writable data directory for the demo JSON store; run as the non-root "node" user
