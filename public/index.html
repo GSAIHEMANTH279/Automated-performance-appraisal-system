@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
   <script src="/cycles.js" defer></script>
+  <script src="/self-assessment.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -48,6 +49,10 @@
           <label class="wide">Success metric<input name="metric" maxlength="200" placeholder="How will success be measured?"></label>
           <div class="wide form-footer"><span class="muted small">Submitted goals are visible to managers for review.</span><button class="button button-primary" type="submit">Submit goal →</button></div>
         </form><p id="goal-message" class="notice" role="status"></p>
+      </section>
+      <section id="self-assessment-section" class="panel hidden">
+        <div class="section-heading"><div><p class="eyebrow">YEAR-END APPRAISAL</p><h2>My self-assessment</h2></div><span class="pill">Employee</span></div>
+        <div id="self-assessment-body"></div>
       </section>
       <section id="cycles-section" class="panel hidden">
         <div class="section-heading"><div><p class="eyebrow">APPRAISAL CYCLES</p><h2>Appraisal cycles</h2></div><span class="pill">HR</span></div>

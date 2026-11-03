@@ -11,3 +11,10 @@
 .progress-block progress{width:100%;height:8px;margin:8px 0;accent-color:var(--blue)}
 .progress-history{margin:6px 0 0;padding-left:18px;font-size:13px}
 .progress-form{display:grid;grid-template-columns:1fr 80px auto;gap:8px;margin-top:10px}
+
+/* APAS-10 self-assessment */
+.rating-form{display:grid;gap:12px}
+.rating-row label{display:grid;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.rating-row{display:grid;grid-template-columns:1fr 120px;gap:8px 14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--white)}
+.rating-row .wide,.rating-row p{grid-column:1/-1;margin:0}
+.rating-row select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px}
