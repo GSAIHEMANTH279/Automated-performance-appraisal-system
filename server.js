@@ -215,6 +215,7 @@ const isIsoDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Da
 const ctx = { readStore, writeStore, audit, requireAuth, requireRole, safeUser, isIsoDate };
 require('./routes/cycles')(app, ctx);
 require('./routes/progress')(app, ctx);
+require('./routes/self-assessment')(app, ctx);
 
 if (require.main === module) {
   ensureStore();
