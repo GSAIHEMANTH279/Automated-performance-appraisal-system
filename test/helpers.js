@@ -9,6 +9,7 @@ const accounts = {
   employee3: ['employee3@apas.local', 'employee123'],
   employee4: ['employee4@apas.local', 'employee123'],
   manager: ['manager@apas.local', 'manager123'],
+  manager2: ['manager2@apas.local', 'manager123'],
   hr: ['hr@apas.local', 'hr123']
 };
 

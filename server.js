@@ -34,6 +34,7 @@ function initialStore() {
       employee('u-employee', 'Demo Employee', 'employee@apas.local'),
       { id: 'u-manager', name: 'Demo Manager', email: 'manager@apas.local', role: 'manager', password: passwordHash('manager123') },
       { id: 'u-hr', name: 'Demo HR', email: 'hr@apas.local', role: 'hr', password: passwordHash('hr123') },
+      { id: 'u-manager2', name: 'Second Manager', email: 'manager2@apas.local', role: 'manager', password: passwordHash('manager123') },
       employee('u-employee2', 'Asha Rao', 'employee2@apas.local'),
       employee('u-employee3', 'Rahul Menon', 'employee3@apas.local'),
       employee('u-employee4', 'Priya Shah', 'employee4@apas.local')
@@ -197,6 +198,8 @@ app.patch('/api/goals/:id/review', requireAuth, requireRole('manager', 'hr'), (r
   const store = readStore();
   const goal = store.goals.find(item => item.id === req.params.id);
   if (!goal) return res.status(404).json({ error: 'Goal not found.' });
+  const owner = store.users.find(user => user.id === goal.employeeId);
+  if (req.user.role === 'manager' && owner?.managerId !== req.user.id) return res.status(403).json({ error: 'You can review goals only for employees who report to you.' });
   if (goal.status !== 'Submitted' && goal.status !== 'Needs revision') return res.status(409).json({ error: 'Only submitted or returned goals can be reviewed.' });
   goal.status = status;
   goal.managerComment = comment;
@@ -216,6 +219,7 @@ const ctx = { readStore, writeStore, audit, requireAuth, requireRole, safeUser, 
 require('./routes/cycles')(app, ctx);
 require('./routes/progress')(app, ctx);
 require('./routes/self-assessment')(app, ctx);
+require('./routes/manager-rating')(app, ctx);
 
 if (require.main === module) {
   ensureStore();
