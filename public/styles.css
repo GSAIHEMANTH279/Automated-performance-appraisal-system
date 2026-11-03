@@ -18,3 +18,8 @@
 .rating-row{display:grid;grid-template-columns:1fr 120px;gap:8px 14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--white)}
 .rating-row .wide,.rating-row p{grid-column:1/-1;margin:0}
 .rating-row select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px}
+
+/* APAS-11 manager ratings */
+.team-list{display:grid;gap:14px}
+.team-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:#f8fafc;display:grid;gap:10px}
+.team-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
