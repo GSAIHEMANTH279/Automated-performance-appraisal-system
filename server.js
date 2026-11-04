@@ -231,6 +231,7 @@ require('./routes/progress')(app, ctx);
 require('./routes/self-assessment')(app, ctx);
 require('./routes/manager-rating')(app, ctx);
 require('./routes/finalize')(app, ctx);
+require('./routes/reports')(app, ctx);
 
 if (require.main === module) {
   ensureStore();
