@@ -14,6 +14,7 @@ const accounts = {
 };
 
 function startServer() {
+  process.env.APAS_DEMO_ASSESSMENTS = 'off'; // tests create their own appraisals
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'apas-test-'));
   process.env.APAS_DATA_FILE = path.join(tempDir, 'store.json');
   const { app } = require('../server');

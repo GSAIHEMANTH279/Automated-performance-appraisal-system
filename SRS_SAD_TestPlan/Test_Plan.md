@@ -173,7 +173,7 @@ Status as of 29-Oct-2026: **Pass** = automated test passing in CI; **Not run** =
 | TC-SCORE-01 | FR-009 | Score fixture from SRS §4.5.1 | Final score 4.02, band Exceeds | Unit | Pass |
 | TC-SCORE-02 | FR-009 | Calculate with a missing manager rating | Calculation/finalization rejected | Unit | Pass |
 | TC-SCORE-03 | FR-010 | Rank three finalized employees | Ordered by final score descending | Unit | Planned |
-| TC-SCORE-04 | FR-010 | Two employees with equal final score | Tie rule applied (manager score, then shared rank) | Unit | Planned |
+| TC-SCORE-04 | FR-010 | Two employees with equal final score | Tie rule applied (manager score, then shared rank) | Unit | Automated (`test/ranking.test.js`) |
 | TC-SCORE-05 | FR-010 | Cycle containing a non-finalized appraisal | Excluded from ranking | Unit | Planned |
 | TC-SCORE-06 | NFR-004 | Recalculate same inputs twice | Identical scores and ranks | Unit | Pass |
 | TC-REL-01 | FR-011 | HR finalizes and releases cycle | 200, results visible to employees, audited | Automated | Planned |

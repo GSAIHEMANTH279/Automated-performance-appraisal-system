@@ -23,3 +23,9 @@
 .team-list{display:grid;gap:14px}
 .team-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:#f8fafc;display:grid;gap:10px}
 .team-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+
+/* APAS-13 ranking */
+.ranking-table{width:100%;border-collapse:collapse;margin-top:12px;background:var(--white)}
+.ranking-table th,.ranking-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+.ranking-table th{font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.button[disabled]{opacity:.5;cursor:not-allowed}

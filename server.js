@@ -29,6 +29,13 @@ function initialStore() {
   const now = new Date().toISOString();
   const employee = (id, name, email) => ({ id, name, email, role: 'employee', managerId: 'u-manager', password: passwordHash('employee123') });
   const goal = (employeeId, title, metric, weight, status, managerComment = '') => ({ id: crypto.randomUUID(), employeeId, cycleId: DEFAULT_CYCLE_ID, title, description: '', metric, dueDate: '2027-03-15', weight, status, managerComment, createdAt: now, updatedAt: now });
+  const goals = demoGoals(goal);
+  // Demo appraisals already rated for two employees, so HR can show finalization quickly (APAS-13).
+  const rated = (employeeId, self, manager) => {
+    const mine = goals.filter(item => item.employeeId === employeeId);
+    const map = values => Object.fromEntries(mine.map((item, i) => [item.id, { rating: values[i], comment: '' }]));
+    return { id: crypto.randomUUID(), cycleId: DEFAULT_CYCLE_ID, employeeId, selfRatings: map(self), selfSubmittedAt: now, managerRatings: map(manager), managerId: 'u-manager', managerSubmittedAt: now, status: 'ManagerRated', createdAt: now };
+  };
   return {
     users: [
       employee('u-employee', 'Demo Employee', 'employee@apas.local'),
@@ -40,18 +47,21 @@ function initialStore() {
       employee('u-employee4', 'Priya Shah', 'employee4@apas.local')
     ],
     cycles: [defaultCycle(now)],
-    goals: [
-      { ...goal('u-employee', 'Complete assigned learning path', 'All modules completed', DEFAULT_WEIGHT, 'Submitted'), description: 'Finish the agreed learning modules and share key takeaways.', dueDate: '2026-12-15' },
-      goal('u-employee2', 'Reduce the support ticket backlog', 'Backlog under 20 tickets', 60, 'Approved', 'Clear and measurable.'),
-      goal('u-employee2', 'Mentor two new joiners', 'Both complete onboarding', 40, 'Approved'),
-      goal('u-employee3', 'Ship the billing module', 'Released to production', 50, 'Approved'),
-      goal('u-employee3', 'Raise test coverage to 80%', 'Coverage report at 80%', 50, 'Approved'),
-      goal('u-employee4', 'Automate the monthly reports', 'Reports generated without manual steps', 70, 'Approved'),
-      goal('u-employee4', 'Complete security training', 'Certificate earned', 30, 'Approved')
-    ],
-    assessments: [],
+    goals,
+    assessments: process.env.APAS_DEMO_ASSESSMENTS === 'off' ? [] : [rated('u-employee3', [4, 4], [4, 3]), rated('u-employee4', [3, 5], [4, 5])],
     audit: [{ id: crypto.randomUUID(), actorId: 'system', action: 'DEMO_DATA_INITIALIZED', targetId: null, at: now }]
   };
+}
+function demoGoals(goal) {
+  return [
+    { ...goal('u-employee', 'Complete assigned learning path', 'All modules completed', DEFAULT_WEIGHT, 'Submitted'), description: 'Finish the agreed learning modules and share key takeaways.', dueDate: '2026-12-15' },
+    goal('u-employee2', 'Reduce the support ticket backlog', 'Backlog under 20 tickets', 60, 'Approved', 'Clear and measurable.'),
+    goal('u-employee2', 'Mentor two new joiners', 'Both complete onboarding', 40, 'Approved'),
+    goal('u-employee3', 'Ship the billing module', 'Released to production', 50, 'Approved'),
+    goal('u-employee3', 'Raise test coverage to 80%', 'Coverage report at 80%', 50, 'Approved'),
+    goal('u-employee4', 'Automate the monthly reports', 'Reports generated without manual steps', 70, 'Approved'),
+    goal('u-employee4', 'Complete security training', 'Certificate earned', 30, 'Approved')
+  ];
 }
 function migrateStore(store) {
   const now = new Date().toISOString();
@@ -220,6 +230,7 @@ require('./routes/cycles')(app, ctx);
 require('./routes/progress')(app, ctx);
 require('./routes/self-assessment')(app, ctx);
 require('./routes/manager-rating')(app, ctx);
+require('./routes/finalize')(app, ctx);
 
 if (require.main === module) {
   ensureStore();
