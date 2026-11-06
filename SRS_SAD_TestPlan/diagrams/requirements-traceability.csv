@@ -1,4 +1,4 @@
-Requirement ID,Feature area,Test IDs,Evidence,Status
+Requirement ID,Feature area,Test IDs,Planned evidence,Status
 FR-001,Sign-in and role access,TC-AUTH-01;TC-AUTH-02;TC-AUTH-03,API tests in CI,A
 FR-002,Appraisal cycle creation,TC-CYCLE-01;TC-CYCLE-02,API tests in CI,A
 FR-003,Goal submission,TC-GOAL-01;TC-GOAL-02,API tests in CI,A

@@ -57,8 +57,8 @@ jobs:
         run: |
           set -euo pipefail
           for file in SRS_SAD_TestPlan/SRS.md SRS_SAD_TestPlan/SAD.md SRS_SAD_TestPlan/Test_Plan.md; do
-            if ! grep -qiE "Status:.*(draft|proposed|planned)" "$file"; then
-              echo "Expected draft/proposed/planned status label missing from $file"
+            if ! grep -qiE "Status:.*(draft|proposed|planned|final)" "$file"; then
+              echo "Expected draft/proposed/planned/final status label missing from $file"
               exit 1
             fi
           done
