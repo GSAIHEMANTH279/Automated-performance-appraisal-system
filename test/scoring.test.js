@@ -1,7 +1,7 @@
 // APAS-12 · TC-SCORE-01, TC-SCORE-02, TC-SCORE-06 and the rating bands
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { calculateScore, ratingBand, ScoringError } = require('../lib/scoring');
+const { calculateScore, ratingBand, rank, ScoringError } = require('../lib/scoring');
 
 const fixture = () => [
   { weight: 60, selfRating: 4, managerRating: 5 },
@@ -26,6 +26,8 @@ test('TC-SCORE-02: a missing manager rating blocks the calculation', () => {
 
 test('TC-SCORE-06: recalculating the same inputs gives identical results', () => {
   assert.deepEqual(calculateScore(fixture()), calculateScore(fixture()));
+  const results = [{ finalScore: 3.5, managerScore: 3.5 }, { finalScore: 4.02, managerScore: 4.2 }];
+  assert.deepEqual(rank(results), rank(results));
 });
 
 test('final score rounds to two decimals without float drift', () => {

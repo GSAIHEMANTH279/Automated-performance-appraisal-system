@@ -1,10 +1,10 @@
 # Software Requirements Specification (SRS)
 
 **Project:** Automated Performance Appraisal System (APAS)
-**Version:** 1.2
+**Version:** 2.0
 **Authors:** G Sai Hemanth (PES1UG24AM101), Nivas Reddy D (PES1UG24AM075), D A V Sreeram (PES1UG24AM076), J Karthik (PES1UG25AM804)
-**Date:** 29-10-2026
-**Status:** Draft for guide review
+**Date:** 06-11-2026
+**Status:** Final, awaiting guide sign-off
 
 ## Revision history
 
@@ -13,6 +13,7 @@
 | 1.0 | 27-10-2026 | Team 9 | Initial requirements | Pending |
 | 1.1 | 28-10-2026 | Team 9 | Aligned with course template; implementation status added | Pending |
 | 1.2 | 29-10-2026 | G Sai Hemanth | Feature-wise requirement tables, proposed scoring policy, use-case diagrams embedded, RTM in template format | Pending |
+| 2.0 | 06-11-2026 | Nivas Reddy D | Final status: RTM and interfaces updated to match the built release; deviations referenced | Pending |
 
 ## Approvals
 
@@ -49,7 +50,7 @@ APAS – Automated Performance Appraisal System; KPI – Key Performance Indicat
 ## 2. Overall description
 
 ### 2.1 Product perspective
-APAS is a standalone web application. Users work in a browser; a Node.js/Express server exposes a JSON API, enforces authentication and authorization, and persists data. The current release stores data in a local JSON file and keeps sessions in server memory; a database is planned before multi-user deployment.
+APAS is a standalone web application. Users work in a browser; a Node.js/Express server exposes a JSON API, enforces authentication and authorization, and persists data. The current release stores data in a local JSON file and keeps sessions in server memory; a database is future work, needed before any multi-user deployment.
 
 ### 2.2 Major product functions
 - Authenticate users and enforce role-based access
@@ -87,8 +88,8 @@ Responsive browser UI with a sign-in screen and a role-specific workspace: goal 
 No special hardware is required; any device that runs a modern browser is supported.
 
 ### 3.3 Software interfaces
-- **APAS REST API (JSON over HTTP):** `/api/health`, `/api/login`, `/api/logout`, `/api/me`, `/api/goals`, `/api/goals/:id/review`, `/api/audit` (implemented); `/api/cycles`, `/api/goals/:id/progress`, `/api/assessments`, `/api/cycles/:id/finalize`, `/api/cycles/:id/ranking`, `/api/cycles/:id/report` (planned).
-- **Persistence:** local JSON store (current), relational database (planned).
+- **APAS REST API (JSON over HTTP):** `/api/health`, `/api/login`, `/api/logout`, `/api/me`, `/api/goals`, `/api/goals/:id/review`, `/api/goals/:id/progress`, `/api/cycles`, `/api/cycles/:id`, `/api/cycles/:id/self-assessment`, `/api/cycles/:id/team`, `/api/cycles/:id/assessments/:employeeId/manager`, `/api/cycles/:id/finalize`, `/api/cycles/:id/ranking`, `/api/cycles/:id/report`, `/api/employees/:id/history`, `/api/audit`.
+- **Persistence:** local JSON store (this release); relational database is future work.
 - **GitHub Actions:** automated build and test on every push and pull request.
 
 ### 3.4 Communications
@@ -139,7 +140,9 @@ Description: The system converts ratings into a final score and ranks employees 
 | FR-009 | The system shall calculate each employee's final score using the approved, versioned scoring policy (4.5.1). | Functional | High | HR | Known fixture returns the expected score (example below = 4.02); missing ratings block calculation. Test: TC-SCORE-01, TC-SCORE-02 | Scoring policy |
 | FR-010 | The system shall rank finalized employees within the same cycle by final score, applying the documented tie rule. | Functional | High | HR | Correct order; ties handled per policy; non-finalized appraisals excluded. Test: TC-SCORE-03, TC-SCORE-04, TC-SCORE-05 | FR-009, FR-011 |
 
-#### 4.5.1 Proposed scoring policy (v1, pending team approval – Jira APAS-12)
+#### 4.5.1 Scoring policy (v1)
+
+Implemented in `lib/scoring.js` (Jira APAS-12, APAS-13). Team confirmation of this policy is to be recorded on Jira APAS-12.
 
 1. **Rating scale:** 1 = Unsatisfactory, 2 = Needs improvement, 3 = Meets expectations, 4 = Exceeds expectations, 5 = Outstanding.
 2. **Goal weights:** each employee's approved goals carry integer weights that sum to 100.
@@ -217,32 +220,32 @@ Sources: `diagrams/use-case-appraisal-lifecycle.puml`, `diagrams/use-case-report
 
 ## 8. Requirements Traceability Matrix (RTM)
 
-Comments cite Jira issue keys (project APAS). Status key: **N** = not started, **P** = partially implemented / tests pending, **A** = implemented and accepted (tests passed).
+Status as of 06-11-2026. Differences from these requirements are explained in `docs/DEVIATIONS.md`. Comments cite Jira issue keys (project APAS). Status key: **N** = not started, **P** = partially implemented / tests pending, **A** = implemented and accepted (tests passed).
 
 | Req ID | Requirement short | Section ref / Design Spec | Module | Test case(s) | Status (N/P/A) | Comments |
 |---|---|---|---|---|---|---|
 | FR-001 | Sign in & role access | 4.1 / SAD 3.4 Auth | Auth middleware (`server.js`) | TC-AUTH-01, 02, 03 | A | All three automated tests pass in CI |
-| FR-002 | Create appraisal cycle | 4.2 / SAD 3.4 Cycle | Cycle service | TC-CYCLE-01, 02 | N | Sprint 2 (APAS-14) |
-| FR-003 | Submit goal | 4.3 / SAD 4.4 API A | Goal service | TC-GOAL-01, 02 | P | Weight field to be added |
-| FR-004 | Approve / return goal | 4.3 / SAD 4.4 API B | Goal service | TC-GOAL-03, 04 | P | Assigned-manager check pending (APAS-15) |
-| FR-005 | Progress updates | 4.3 / SAD 3.4 Goal | Goal service | TC-GOAL-05 | N | Sprint 1 (APAS-9) |
-| FR-006 | Role dashboard | 4.2 / SAD 4.6 UX | Web UI | TC-DASH-01 | P | Role views exist; cycle filter pending |
-| FR-007 | Self-assessment | 4.4 / SAD 3.4 Assessment | Assessment service | TC-APP-01, 02 | N | Sprint 2 (APAS-10) |
-| FR-008 | Manager rating | 4.4 / SAD 3.4 Assessment | Assessment service | TC-APP-03 | N | Sprint 2 (APAS-11) |
-| FR-009 | Score calculation | 4.5 / SAD 3.4 Scoring | Scoring service | TC-SCORE-01, 02 | N | Sprint 2 (APAS-12) |
-| FR-010 | Ranking | 4.5 / SAD 3.4 Scoring | Scoring service | TC-SCORE-03, 04, 05 | N | Sprint 2 (APAS-13) |
-| FR-011 | Finalize & release | 4.6 / SAD 4.4 proposed | Finalization service | TC-REL-01, 02 | N | Sprint 2 (APAS-13) |
-| FR-012 | Appraisal history | 4.6 / SAD 3.4 Reporting | Reporting service | TC-HIST-01 | N | Sprint 2 (new Jira story needed) |
-| FR-013 | Cycle report | 4.6 / SAD 3.4 Reporting | Reporting service | TC-REP-01 | N | Sprint 2 (new Jira story needed) |
-| FR-014 | Audit events | 4.7 / SAD 3.4 Audit | Audit service | TC-AUD-01 | P | Login/goal events logged; rating/finalize events pending |
-| FR-015 | Reopen with reason | 4.6 / SAD 4.4 proposed | Finalization service | TC-REL-03 | N | Future work |
-| NFR-001 | Response time | 5 / SAD 3.6 | Web UI / API | TC-PERF-01 | N | Sprint 2 (APAS-17) |
-| NFR-002 | No partial finalization | 5 / SAD 3.7 | Finalization service | TC-REL-04 | N | Atomic write already used for JSON store |
-| NFR-003 | Record-level privacy | 5 / SAD 3.9 | Auth middleware | TC-SEC-01, TC-GOAL-04 | P | Role-level done; record-level pending |
-| NFR-004 | Reproducible scores | 5 / SAD 3.4 Scoring | Scoring service | TC-SCORE-06 | N | Sprint 2 (APAS-12) |
-| NFR-005 | Usable forms | 5 / SAD 4.6 | Web UI | TC-UX-01 | P | Inline validation present |
-| SR-001 | HTTPS in deployment | 5.1.2 / SAD 3.9 | Deployment | TC-SEC-02 | N | No deployed instance yet |
-| SR-002 | Hashed passwords | 5.1.2 / SAD 3.9 | Auth | TC-SEC-03 | P | scrypt implemented; inspection test pending |
-| SR-003 | Server-side authorization | 5.1.2 / SAD 3.9 | Auth middleware | TC-SEC-01 | P | Automated wrong-role test passes |
-| SR-004 | Input validation | 5.1.2 / SAD 4.5 | API handlers | TC-SEC-04 | P | 32 KB body limit; invalid review decision test passes |
-| SR-005 | Immutable audit log | 5.1.2 / SAD 3.9 | Audit service | TC-AUD-02 | P | No mutation endpoint exists |
+| FR-002 | Create appraisal cycle | 4.2 / SAD 3.4 Cycle | Cycle service | TC-CYCLE-01, 02 | A | TC-CYCLE-01, 02 pass (APAS-14) |
+| FR-003 | Submit goal | 4.3 / SAD 4.3 Component A | Goal service | TC-GOAL-01, 02 | A | Weight field added in APAS-14; tests pass |
+| FR-004 | Approve / return goal | 4.3 / SAD 4.3 Component A | Goal service | TC-GOAL-03, 04 | A | Own-team check added in APAS-11; tests pass |
+| FR-005 | Progress updates | 4.3 / SAD 3.4 Goal | Goal service | TC-GOAL-05 | A | TC-GOAL-05 passes (APAS-21) |
+| FR-006 | Role dashboard | 4.2 / SAD 4.5 | Web UI | TC-DASH-01 | P | Role panels, counts and cycle banner pass TC-DASH-01; no per-cycle filter (see deviations) |
+| FR-007 | Self-assessment | 4.4 / SAD 3.4 Assessment | Assessment service | TC-APP-01, 02 | A | TC-APP-01, 02 pass (APAS-10) |
+| FR-008 | Manager rating | 4.4 / SAD 3.4 Assessment | Assessment service | TC-APP-03 | A | TC-APP-03 passes (APAS-11) |
+| FR-009 | Score calculation | 4.5 / SAD 3.4 Scoring | Scoring service | TC-SCORE-01, 02 | A | TC-SCORE-01, 02 pass (APAS-12) |
+| FR-010 | Ranking | 4.5 / SAD 3.4 Scoring | Scoring service | TC-SCORE-03, 04, 05 | A | TC-SCORE-03, 04, 05 pass (APAS-13) |
+| FR-011 | Finalize & release | 4.6 / SAD 4.3 Component C | Finalization service | TC-REL-01, 02 | A | TC-REL-01, 02 pass (APAS-13); finalizing also releases results (see deviations) |
+| FR-012 | Appraisal history | 4.6 / SAD 3.4 Reporting | Reporting service | TC-HIST-01 | A | TC-HIST-01 passes (APAS-22) |
+| FR-013 | Cycle report | 4.6 / SAD 3.4 Reporting | Reporting service | TC-REP-01 | A | TC-REP-01 passes (APAS-22) |
+| FR-014 | Audit events | 4.7 / SAD 3.4 Audit | Audit service | TC-AUD-01 | P | All listed events are logged and were checked manually; automated test for rating and finalization events due with APAS-16 |
+| FR-015 | Reopen with reason | 4.6 / SAD 4.3 Component C | Finalization service | TC-REL-03 | N | Not built in this release (see deviations) |
+| NFR-001 | Response time | 5 / SAD 3.6 | Web UI / API | TC-PERF-01 | A | p95 42 ms in `npm run perf` (APAS-17, `docs/PERFORMANCE.md`) |
+| NFR-002 | No partial finalization | 5 / SAD 3.7 | Finalization service | TC-REL-04 | P | Finalizing twice is refused and results are saved in one atomic write; write-failure test not run |
+| NFR-003 | Record-level privacy | 5 / SAD 3.9 | Auth middleware | TC-SEC-01, TC-GOAL-04 | A | TC-SEC-01 and TC-GOAL-04 pass |
+| NFR-004 | Reproducible scores | 5 / SAD 3.4 Scoring | Scoring service | TC-SCORE-06 | A | TC-SCORE-06 passes; policy version stored with each result |
+| NFR-005 | Usable forms | 5 / SAD 4.5 | Web UI | TC-UX-01 | A | TC-UX-01 passed manually |
+| SR-001 | HTTPS in deployment | 5.1.2 / SAD 3.9 | Deployment | TC-SEC-02 | N | No deployed instance in this release (see deviations) |
+| SR-002 | Hashed passwords | 5.1.2 / SAD 3.9 | Auth | TC-SEC-03 | A | TC-SEC-03 passes (APAS-5) |
+| SR-003 | Server-side authorization | 5.1.2 / SAD 3.9 | Auth middleware | TC-SEC-01 | A | TC-SEC-01 and TC-GOAL-04 pass |
+| SR-004 | Input validation | 5.1.2 / SAD 4.4 | API handlers | TC-SEC-04 | A | TC-SEC-04 passes (APAS-5) |
+| SR-005 | Immutable audit log | 5.1.2 / SAD 3.9 | Audit service | TC-AUD-02 | P | No mutation endpoint exists; TC-AUD-02 due with APAS-16 |
