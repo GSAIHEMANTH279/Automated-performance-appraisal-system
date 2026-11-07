@@ -1,10 +1,10 @@
 # Software Architecture and Design Specification (SAD)
 
 **Project:** Automated Performance Appraisal System (APAS)
-**Version:** 1.2
+**Version:** 2.0
 **Authors:** G Sai Hemanth (PES1UG24AM101), Nivas Reddy D (PES1UG24AM075), D A V Sreeram (PES1UG24AM076), J Karthik (PES1UG25AM804)
-**Date:** 29-10-2026
-**Status:** Draft for guide review
+**Date:** 06-11-2026
+**Status:** Final, awaiting guide sign-off
 
 ## Revision History
 
@@ -13,6 +13,7 @@
 | 1.0 | 27-10-2026 | Team 9 | Initial architecture draft |
 | 1.1 | 28-10-2026 | Team 9 | Aligned stack, APIs and states with the MVP |
 | 1.2 | 29-10-2026 | G Sai Hemanth | UML class diagram, component list matched to RTM, cleanup |
+| 2.0 | 06-11-2026 | Nivas Reddy D | Final status: components, APIs, states and security updated to match the built release |
 
 ## Approvals
 
@@ -27,7 +28,7 @@
 This document specifies the architecture and design of the Automated Performance Appraisal System (APAS).
 
 ### 1.2 Scope
-Covers the full appraisal workflow: authentication, appraisal cycles, goal setting and review, progress tracking, self-assessment, manager rating, scoring, ranking, HR finalization, reporting and audit. Components already implemented in the Sprint 1 MVP and those scheduled for Sprint 2 are identified in sections 3.4 and 3.6.
+Covers the full appraisal workflow: authentication, appraisal cycles, goal setting and review, progress tracking, self-assessment, manager rating, scoring, ranking, HR finalization, reporting and audit. Section 3.4 shows where each component is implemented. Differences from the original design are listed in `docs/DEVIATIONS.md`.
 
 ### 1.3 Audience
 Developers, testers, the course coordinator, evaluators and maintainers.
@@ -58,7 +59,7 @@ Section 3 describes the architecture (components, pattern, stack, risks, securit
 
 ### 3.3 Component (UML) Diagram
 
-**UML class diagram** (classes marked «planned» are delivered in Sprint 2):
+**UML class diagram** (drawn before Sprint 2; the classes marked «planned» were delivered in Sprint 2):
 
 ![UML class diagram](diagrams/rendered/class-diagram.png)
 
@@ -75,7 +76,7 @@ flowchart TD
   ASSESS --> SCORE[Scoring & ranking service]
   API --> REPORT[Reporting service]
   API --> AUDIT[Audit service]
-  AUTH --> STORE[(Data store<br/>JSON file → database)]
+  AUTH --> STORE[(Data store<br/>JSON file)]
   GOAL --> STORE
   CYCLE --> STORE
   ASSESS --> STORE
@@ -90,15 +91,15 @@ Sources: `diagrams/class-diagram.mmd`, `diagrams/component-architecture.puml`.
 
 | Component | Responsibility | Implementation | Status |
 |---|---|---|---|
-| Web UI | Sign-in, role workspaces, goal form, review queue, audit view | `public/index.html`, `public/app.js`, `public/styles.css` | Implemented |
-| Auth | Login/logout, scrypt password hashing, HttpOnly session cookie, `requireAuth` / `requireRole` middleware, login throttling | `server.js` | Implemented (record-level check in Sprint 2) |
-| Goal | Submit goal, list goals by role, approve/return with comment, progress updates | `server.js` | Submit/review implemented; progress in Sprint 2 |
-| Cycle | Create/open/close appraisal cycles | – | Sprint 2 |
-| Assessment | Employee self-assessment and manager ratings per goal | – | Sprint 2 |
-| Scoring | Apply versioned scoring policy, compute rating band and rank | – | Sprint 2 |
-| Reporting | Cycle summary, ranking report, appraisal history | – | Sprint 2 |
+| Web UI | Sign-in, role workspaces, goal form, review queue, self-assessment, team ratings, finalize and ranking, results, report, audit view | `public/index.html`, `public/app.js`, one script per feature, `public/styles.css` | Implemented |
+| Auth | Login/logout, scrypt password hashing, HttpOnly session cookie, `requireAuth` / `requireRole` middleware, login throttling | `server.js` | Implemented |
+| Goal | Submit goal, list goals by role, approve/return with comment (own team only for managers), progress updates | `server.js`, `routes/progress.js` | Implemented |
+| Cycle | Create/open/close appraisal cycles | `routes/cycles.js` | Implemented |
+| Assessment | Employee self-assessment and manager ratings per goal | `routes/self-assessment.js`, `routes/manager-rating.js`, `lib/ratings.js` | Implemented |
+| Scoring | Apply versioned scoring policy, compute rating band and rank; HR finalization | `lib/scoring.js`, `routes/finalize.js` | Implemented |
+| Reporting | Cycle summary, ranking report, appraisal history | `routes/reports.js`, `routes/finalize.js` | Implemented |
 | Audit | Append-only record of actor, action, target, timestamp; HR read access | `server.js` | Implemented |
-| Data store | Users, goals, audit (and later cycles, assessments, results) | `data/store.json` with atomic temp-file rename | Implemented for demo |
+| Data store | Users, cycles, goals, assessments (with results), audit | `data/store.json` with atomic temp-file rename | Implemented for demo |
 
 ### 3.5 Chosen Architecture Pattern and Rationale
 A **layered monolith** (presentation → API → services → data store) running as one Node.js process. It keeps deployment and testing simple for a four-person, two-sprint project while still separating concerns. Microservices were rejected as unnecessary overhead at this scale; a pure client-side app was rejected because authorization must be enforced on the server.
@@ -109,9 +110,9 @@ A **layered monolith** (presentation → API → services → data store) runnin
 |---|---|---|
 | UI | HTML, CSS, vanilla JavaScript | Served as static files by Express |
 | Server/API | Node.js 20+, Express 4 | JSON REST API |
-| Data store | JSON file (`data/store.json`) | Demo only; database planned (future work) |
+| Data store | JSON file (`data/store.json`) | Demo only; database is future work |
 | Security | Node `crypto` scrypt, HttpOnly SameSite cookie, CSP and security headers | Secure cookie flag in production |
-| Testing | Node built-in test runner + fetch | `npm run check` |
+| Testing | Node built-in test runner + fetch; response-time script | `npm run check`, `npm run perf` |
 | CI | GitHub Actions (Node 22) | Runs on every push and PR |
 
 ### 3.7 Risks & Mitigations
@@ -120,8 +121,8 @@ A **layered monolith** (presentation → API → services → data store) runnin
 |---|---|
 | JSON file corruption from concurrent writes | Atomic temp-file rename now; move to a transactional database before multi-user use |
 | Sessions lost on server restart | Acceptable for demo; persistent session store before deployment |
-| Manager reviews an employee they don't manage | Add `managerId` to users and record-level check (Jira APAS-15) |
-| Scoring policy disputed | Versioned policy stored with each result; team approval (Jira APAS-12) |
+| Manager reviews an employee they don't manage | Resolved: `managerId` on users and own-team checks on review and rating (TC-GOAL-04) |
+| Scoring policy disputed | Policy version stored with each result; team confirmation on Jira APAS-12 |
 | Docs drift from code | Update SRS/SAD/Test Plan in the same PR as code changes |
 
 ### 3.8 Traceability to Requirements
@@ -142,8 +143,8 @@ A **layered monolith** (presentation → API → services → data store) runnin
 **Threat modeling (STRIDE):**
 - **Spoofing:** scrypt-hashed passwords, random 256-bit session tokens, login throttling after 8 failures.
 - **Tampering:** server-side validation and controlled status transitions (409 on invalid state).
-- **Repudiation:** audit events for login, logout, goal submission and review.
-- **Information disclosure:** role checks on every route; employees see only their own goals; record-level manager scoping in Sprint 2.
+- **Repudiation:** audit events for login, logout, goal submission, review and progress, cycle changes, self-assessment, manager rating and finalization.
+- **Information disclosure:** role checks on every route; employees see only their own goals and results; managers review and rate only their own team.
 - **Denial of service:** 32 KB request body limit and login rate limiting.
 - **Elevation of privilege:** deny-by-default `requireRole` middleware; no client-side-only checks.
 
@@ -152,7 +153,7 @@ HTTP security headers: Content-Security-Policy, X-Frame-Options DENY, X-Content-
 ## 4. Design
 
 ### 4.1 Design Overview
-Goal statuses: **Submitted → Approved** or **Submitted → Needs revision → (resubmit) → Approved**. Appraisal states (Sprint 2): Open → Self-assessment submitted → Manager rated → HR finalized → Released, with an authorized Reopen back to manager review.
+Goal statuses: **Submitted → Approved** or **Submitted → Needs revision → (resubmit) → Approved**. Appraisal states as built (`status` on each assessment): SelfSubmitted → ManagerRated → Finalized. Finalizing also releases the results and closes the cycle. The diagram below shows the original design; its separate Released and Reopened states were not built (see `docs/DEVIATIONS.md`).
 
 ![Appraisal state machine](diagrams/rendered/appraisal-state-machine.png)
 
@@ -179,7 +180,7 @@ sequenceDiagram
   API-->>UI: 200 OK (updated goal)
 ```
 
-**Sequence 2 – HR finalizes a cycle and ranks employees (Sprint 2)**
+**Sequence 2 – HR finalizes a cycle and ranks employees (implemented)**
 
 ```mermaid
 sequenceDiagram
@@ -210,8 +211,8 @@ sequenceDiagram
 |---|---|---|
 | Endpoint | `/api/goals` | `/api/goals/:id/review` |
 | Method | POST | PATCH |
-| Auth | Employee | Manager or HR |
-| Request | `{title, description, metric, dueDate}` | `{status: "Approved" \| "Needs revision", comment}` |
+| Auth | Employee | Manager (own team) or HR |
+| Request | `{title, description, metric, dueDate, weight}` | `{status: "Approved" \| "Needs revision", comment}` |
 | Response | `201 {goal}` | `200 {goal}` |
 | Errors | 400 validation, 401 not signed in, 403 wrong role | 400 invalid decision, 401, 403, 404 unknown goal, 409 invalid state |
 
@@ -225,30 +226,30 @@ sequenceDiagram
 | Response | `200 {user}` + `Set-Cookie: apas_session` | `200 {user}` |
 | Errors | 401 invalid credentials, 429 too many attempts | 401 not signed in |
 
-**Component C – Scoring/finalization (Sprint 2)**
+**Component C – Scoring/finalization (implemented)**
 
 | | Finalize cycle | Ranking |
 |---|---|---|
 | Endpoint | `/api/cycles/:id/finalize` | `/api/cycles/:id/ranking` |
 | Method | POST | GET |
 | Auth | HR | HR |
-| Response | `200 {results: [{employeeId, finalScore, band, rank}]}` | `200 {ranking}` |
+| Response | `200 {cycle, ranking: [{rank, employeeId, name, finalScore, managerScore, band}]}` | `200 {cycle, finalized, ranking}` |
 | Errors | 401, 403, 404 unknown cycle, 409 incomplete ratings or already finalized | 401, 403, 404 |
 
-Other routes: `GET /api/health`, `POST /api/logout`, `GET /api/goals`, `GET /api/audit` (HR).
+Other routes: `GET /api/health`, `POST /api/logout`, `GET /api/goals`, `POST /api/goals/:id/progress` (employee, own goal), `GET` and `POST /api/cycles`, `PATCH /api/cycles/:id` (HR), `GET` and `PUT /api/cycles/:id/self-assessment` (employee), `GET /api/cycles/:id/team` (manager, HR), `PUT /api/cycles/:id/assessments/:employeeId/manager` (manager, own team), `GET /api/cycles/:id/report` (HR), `GET /api/employees/:id/history` (self, own manager, HR), `GET /api/audit` (HR).
 
 ### 4.4 Error Handling, Logging & Monitoring
 All errors return JSON `{error: "<user-friendly message>"}` with the correct HTTP status; stack traces are never sent to clients. Passwords and session tokens are never written to the audit log. Monitoring for the demo is the `/api/health` endpoint and GitHub Actions results; production would add centralized logs and uptime alerts.
 
 ### 4.5 UX Design
-Single-page layout with a sign-in card, role badge, and role-specific panels: employee goal form with inline validation and status pills; manager review queue with Approve / Return buttons and a comment box; HR audit list. Responsive down to 360 px; status shown by text as well as colour.
+Single-page layout with a sign-in card, role badge, and role-specific panels: employee goal form with inline validation and status pills; manager review queue with Approve / Return buttons and a comment box, plus team ratings; HR finalize and ranking, cycle report, cycles and audit list; employee self-assessment and results. Responsive down to 360 px; status shown by text as well as colour.
 
-### 4.6 Open Issues & Next Steps
-1. Approve scoring policy v1 (Jira APAS-12).
-2. Add manager–employee assignment and record-level checks (Jira APAS-15).
-3. Implement cycles, progress, assessment, scoring, ranking and reports (Jira APAS-9 to APAS-14).
-4. Add a deploy stage to the CI/CD pipeline (Jira APAS-18).
-5. Replace the JSON store with a database (future work).
+### 4.6 Open Issues & Future Work
+1. Reopen a finalized appraisal with a recorded reason (FR-015, not built).
+2. Separate the finalize and release steps (FR-011 combines them in this release).
+3. Replace the JSON store and in-memory sessions with a database and a persistent session store.
+4. Serve any deployed instance over HTTPS (SR-001; there is no deployed instance in this release).
+5. Simulate a write failure during finalization (remaining part of TC-REL-04).
 
 ## 5. Appendices
 
