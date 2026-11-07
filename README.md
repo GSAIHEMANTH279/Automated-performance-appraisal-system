@@ -10,24 +10,27 @@ A Software Engineering mini-project for a typical company performance appraisal 
 | Sign-in and role-based access (employee / manager / HR) | ✅ Working |
 | Goal submission, manager approval / return with comment | ✅ Working |
 | HR audit log | ✅ Working |
+| Appraisal cycles, goal weights and progress updates | ✅ Working |
+| Year-end self-assessment and manager rating | ✅ Working |
+| Scoring (30% self + 70% manager), HR finalization and ranking | ✅ Working |
+| Employee results history and HR cycle report | ✅ Working |
 | CI/CD: build → test → deploy (Docker image) | ✅ Working |
-| Appraisal cycles, self-assessment, manager rating, scoring, ranking, reports | Sprint 2 (2–7 Nov 2026) |
 
 ## Release scope
 
 **Employee**
 - Sign in with a seeded account (self-registration is outside this release).
 - Submit measurable goals with a due date; see status and manager feedback.
-- *(Sprint 2)* Record progress updates and submit a year-end self-assessment.
-- *(Sprint 2)* View own released appraisal result.
+- Record progress updates on approved goals and submit a year-end self-assessment.
+- View own final score, rating band and rank once HR finalizes the cycle.
 
 **Manager**
-- Review submitted goals: approve, or return for revision with a comment.
-- *(Sprint 2)* Rate each approved goal of a team member at year end.
+- Review submitted goals of their own team: approve, or return for revision with a comment.
+- Rate each approved goal of a team member at year end, after the self-assessment.
 
 **HR administrator**
 - View the audit log of all sensitive actions.
-- *(Sprint 2)* Create appraisal cycles, finalize appraisals, view the ranking and cycle report.
+- Create, close and reopen appraisal cycles; finalize a cycle; view the ranking and the cycle report.
 
 Payroll, promotions, compensation, email notifications and external HR integrations are outside this release.
 
@@ -37,21 +40,24 @@ Payroll, promotions, compensation, email notifications and external HR integrati
 - Title 3–120 characters; description up to 1000; success metric up to 200; due date required (`YYYY-MM-DD`).
 - New goals start as **Submitted**. A manager or HR sets **Approved** or **Needs revision**; a comment of up to 1000 characters is saved with the decision.
 - Only goals that are *Submitted* or *Needs revision* can be reviewed; an already approved goal returns `409`.
-- Employees see only their own goals; managers and HR see all goals.
+- Each goal has a weight from 1 to 100 (default 10) and belongs to the open appraisal cycle. An employee's approved goals must add up to 100 before HR can finalize the cycle.
+- Employees see only their own goals; managers and HR see all goals; a manager can review only their own team's goals.
+- Progress updates (note + % complete) can be added only to the employee's own approved goals.
 
 **Sign-in (implemented)**
 - Passwords are stored as salted scrypt hashes.
 - Sessions last 8 hours in an HttpOnly, SameSite cookie (Secure in production).
 - After 8 failed sign-ins from one address, sign-in is paused for 60 seconds.
 
-**Year-end appraisal (Sprint 2)**
+**Year-end appraisal**
 - Rating scale: **1** Unsatisfactory · **2** Needs improvement · **3** Meets expectations · **4** Exceeds expectations · **5** Outstanding.
-- Each employee's approved goals carry weights that add up to 100.
+- Only one appraisal cycle can be open at a time; an employee is appraised on their approved goals in that cycle.
 - **Goal score = 30% self-rating + 70% manager rating.**
-- **Final score** = weighted average of goal scores, rounded to 2 decimals.
+- **Final score** = weighted average of goal scores by goal weight, rounded to 2 decimals.
 - Rating band: ≥ 4.50 Outstanding · 3.50–4.49 Exceeds · 2.50–3.49 Meets · 1.50–2.49 Needs improvement · < 1.50 Unsatisfactory.
 - Self-assessment is allowed only while the cycle is open and is locked after submission.
-- An appraisal with any missing manager rating cannot be finalized.
+- A manager rates only after the employee's self-assessment, and only employees who report to them.
+- HR can finalize only when every employee with approved goals is fully rated; finalizing closes the cycle and cannot be undone.
 - **Ranking:** finalized employees in the same cycle, highest final score first; ties broken by the manager-only score; if still equal, employees share the rank (1, 2, 2, 4).
 
 **Worked example:** Goal A (weight 60): self 4, manager 5 → 4.70. Goal B (weight 40): self 3, manager 3 → 3.00. Final = 0.6 × 4.70 + 0.4 × 3.00 = **4.02 → Exceeds expectations**.
@@ -92,14 +98,22 @@ docker run -p 3000:3000 ghcr.io/gsaihemanth279/automated-performance-appraisal-s
 | Employee | employee@apas.local | employee123 |
 | Manager | manager@apas.local | manager123 |
 | HR | hr@apas.local | hr123 |
+| More employees | employee2@apas.local · employee3@apas.local · employee4@apas.local | employee123 |
+| Second manager (no team) | manager2@apas.local | manager123 |
+
+The FY 2026 cycle is open. Asha (employee2) has approved goals ready for the appraisal; Rahul (employee3) and Priya (employee4) are already fully rated so HR can finalize quickly. To start again with fresh demo data, stop the app and delete `data/store.json`.
 
 Demo data only — never enter real employee information.
 
-### Demo flow (≈1 minute)
+### Demo flow (≈2 minutes)
 
-1. Sign in as **employee** → submit a goal.
-2. Sign in as **manager** → approve the goal or return it with a comment.
-3. Sign in as **HR** → open the audit log and see the sign-in, submission and review events.
+1. **employee** → submit a goal with a weight; **manager** → approve it (goal setting).
+2. **employee2** (Asha) → add a progress update, then submit the year-end self-assessment.
+3. **manager** → *My team's appraisals* → rate Asha's goals.
+4. **HR** → *Finalize and rank* → **Finalize cycle** → ranking and cycle report appear.
+5. **employee2** → *My results* shows the final score, band and rank.
+
+The demo employee in step 1 becomes part of the appraisal once their goal is approved; for the shortest demo, approve their goal only after finalizing, or rate them too.
 
 ## API
 
@@ -111,10 +125,21 @@ Demo data only — never enter real employee information.
 | GET | `/api/me` | signed in | Current user |
 | GET | `/api/goals` | signed in | Goals (employees: own only) |
 | POST | `/api/goals` | employee | Submit a goal (`{title, description, metric, dueDate}`) |
-| PATCH | `/api/goals/:id/review` | manager, HR | `{status: "Approved" \| "Needs revision", comment}` |
+| PATCH | `/api/goals/:id/review` | manager (own team), HR | `{status: "Approved" \| "Needs revision", comment}` |
+| POST | `/api/goals/:id/progress` | employee (own goal) | `{note, percent}` |
+| GET | `/api/cycles` | signed in | All cycles, newest first |
+| POST | `/api/cycles` | HR | Start a cycle (`{name, startDate, endDate}`) |
+| PATCH | `/api/cycles/:id` | HR | `{status: "Open" \| "Closed"}` |
+| GET / PUT | `/api/cycles/:id/self-assessment` | employee | Read or submit own self-assessment (`{ratings: [{goalId, rating, comment}]}`) |
+| GET | `/api/cycles/:id/team` | manager, HR | Team members with goals and appraisal status |
+| PUT | `/api/cycles/:id/assessments/:employeeId/manager` | manager (own team) | Submit manager ratings |
+| POST | `/api/cycles/:id/finalize` | HR | Score, rank and close the cycle |
+| GET | `/api/cycles/:id/ranking` | HR | Ranking of finalized employees |
+| GET | `/api/cycles/:id/report` | HR | Cycle summary: counts, average score, bands |
+| GET | `/api/employees/:id/history` | self, own manager, HR | Finalized results per cycle |
 | GET | `/api/audit` | HR | Audit events, newest first |
 
-Errors are returned as `{ "error": "<message>" }` with `400` invalid input, `401` not signed in, `403` wrong role, `404` not found, `409` invalid state, `429` too many sign-in attempts.
+Errors are returned as `{ "error": "<message>" }` with `400` invalid input, `401` not signed in, `403` wrong role, `404` not found, `409` invalid state, `413` request too large, `429` too many sign-in attempts. Stack traces are never sent to the browser.
 
 ## Testing
 
@@ -122,7 +147,7 @@ Errors are returned as `{ "error": "<message>" }` with `400` invalid input, `401
 npm run check        # syntax check + automated API tests
 ```
 
-Automated tests cover the health check, anonymous access (401), employee goal submission, an employee trying to review (403), manager approval, HR audit visibility and invalid review decisions. The full test strategy, test cases and traceability to requirements are in the [Test Plan](SRS_SAD_TestPlan/Test_Plan.md).
+50 automated tests in `test/` cover sign-in and sessions, role and team access, goals and progress, cycles, self-assessment, manager rating, the scoring formula and ranking ties, finalization, history and reports, audit history and input security. `npm run perf` runs the NFR-001 response-time check against a running app. The full test strategy, test cases and traceability to requirements are in the [Test Plan](SRS_SAD_TestPlan/Test_Plan.md).
 
 ## CI/CD pipeline
 
@@ -162,8 +187,12 @@ Jira workflow: **To Do → In Progress → Done**. An item is Done only when the
 ```
 .github/            CI/CD workflows, PR and issue templates
 SRS_SAD_TestPlan/   SRS.md, SAD.md, Test_Plan.md and diagrams/ (UML sources, traceability matrix)
-public/             Browser UI (index.html, app.js, styles.css)
-test/               Automated API tests
+routes/             API routes per feature (cycles, progress, self-assessment, manager-rating, finalize, reports)
+lib/                Scoring policy and rating rules
+public/             Browser UI (index.html, app.js, one script per feature, styles.css)
+test/               Automated tests (one file per feature)
+scripts/            Syntax check and performance check
+docs/               Deviation log
 data/               Local demo data store (generated, not committed)
 server.js           Express server and API
 Dockerfile          Production container image
@@ -176,7 +205,7 @@ Dockerfile          Production container image
 - [Software Test Plan (STP)](SRS_SAD_TestPlan/Test_Plan.md) — strategy, test cases, traceability
 - [Requirements traceability matrix](SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)
 
-Any change from these documents during development is recorded and explained in the final demo.
+Differences between these documents and the built product are listed in [docs/DEVIATIONS.md](docs/DEVIATIONS.md).
 
 ## Team
 
