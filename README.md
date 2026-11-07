@@ -175,6 +175,7 @@ Dockerfile          Production container image
 - [Software Architecture and Design (SAD)](SRS_SAD_TestPlan/SAD.md) — layered architecture, components, sequence diagrams, API design, security
 - [Software Test Plan (STP)](SRS_SAD_TestPlan/Test_Plan.md) — strategy, test cases, traceability
 - [Requirements traceability matrix](SRS_SAD_TestPlan/diagrams/requirements-traceability.csv)
+- [Live demo checklist](docs/DEMO-CHECKLIST.md) — demo accounts, step-by-step demo script, fallback plan
 
 Any change from these documents during development is recorded and explained in the final demo.
 
