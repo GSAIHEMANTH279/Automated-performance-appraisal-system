@@ -233,6 +233,14 @@ require('./routes/manager-rating')(app, ctx);
 require('./routes/finalize')(app, ctx);
 require('./routes/reports')(app, ctx);
 
+// APAS-5 · SR-004: safe JSON errors — never send stack traces to the browser.
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large') return res.status(413).json({ error: 'Request is too large.' });
+  if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Request body is not valid JSON.' });
+  console.error(err);
+  res.status(500).json({ error: 'Something went wrong. Please try again.' });
+});
+
 if (require.main === module) {
   ensureStore();
   app.listen(PORT, () => console.log(`APAS MVP running at http://localhost:${PORT}`));
