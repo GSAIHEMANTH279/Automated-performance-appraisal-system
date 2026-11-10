@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "test": "node --test",
-    "check": "node scripts/check-syntax.js && node --test"
+    "check": "node scripts/check-syntax.js && node --test",
+    "perf": "node scripts/perf-check.js",
+    "report": "node scripts/make-test-reports.js"
   },
   "engines": {
     "node": ">=20"
