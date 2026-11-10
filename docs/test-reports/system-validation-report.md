@@ -6,16 +6,16 @@ Every test case from Test Plan §13. Automated cases are filled in from the test
 
 | Test ID | Requirement | Scenario | Expected result | Type | Status |
 |---|---|---|---|---|---|
-| TC-SMOKE-01 | – | `GET /api/health` | 200, `status: ok` | Automated | Manual: record result |
-| TC-AUTH-01 | FR-001 | Sign in with valid employee credentials | 200, user role returned, session cookie set | Automated | Manual: record result |
+| TC-SMOKE-01 | – | `GET /api/health` | 200, `status: ok` | Automated |Pass (Tested by Karthik, 10-Nov-2026)|
+| TC-AUTH-01 | FR-001 | Sign in with valid employee credentials | 200, user role returned, session cookie set | Automated | Pass (Tested by Karthik, 10-Nov-2026) |
 | TC-AUTH-02 | FR-001 | Sign in with wrong password | 401, generic error message | Automated | Pass (automated) |
-| TC-AUTH-03 | FR-001 | Call `GET /api/goals` without a session | 401 | Automated | Manual: record result |
+| TC-AUTH-03 | FR-001 | Call `GET /api/goals` without a session | 401 | Automated | Pass (Tested by Karthik, 10-Nov-2026) |
 | TC-CYCLE-01 | FR-002 | HR creates cycle with valid dates | 201, cycle stored as Open | Automated | Pass (automated) |
 | TC-CYCLE-02 | FR-002 | End date before start date; employee tries to create cycle | 400; 403 | Automated | Pass (automated) |
-| TC-DASH-01 | FR-006 | Each role opens dashboard | Only permitted records and correct counts shown | Manual | Manual: record result |
-| TC-GOAL-01 | FR-003 | Employee submits valid goal | 201, status Submitted | Automated | Manual: record result |
+| TC-DASH-01 | FR-006 | Each role opens dashboard | Only permitted records and correct counts shown | Manual | Pass (Tested by Karthik, 10-Nov-2026) |
+| TC-GOAL-01 | FR-003 | Employee submits valid goal | 201, status Submitted | Automated | Pass (Tested by Karthik, 10-Nov-2026) |
 | TC-GOAL-02 | FR-003 | Submit goal with 2-character title / invalid date | 400 with clear message | Automated | Pass (automated) |
-| TC-GOAL-03 | FR-004 | Manager approves a submitted goal | 200, status Approved, comment saved | Automated | Manual: record result |
+| TC-GOAL-03 | FR-004 | Manager approves a submitted goal | 200, status Approved, comment saved | Automated | Pass (Tested by Karthik, 10-Nov-2026) |
 | TC-GOAL-04 | FR-004, NFR-003 | Manager reviews a goal of an employee they don't manage | 403, goal unchanged | Automated | Pass (automated) |
 | TC-GOAL-05 | FR-005 | Employee adds progress update to approved goal | 201, timestamp stored | Automated | Pass (automated) |
 | TC-APP-01 | FR-007 | Employee submits self-assessment in open cycle | 200, status SelfSubmitted | Automated | Pass (automated) |
