@@ -1,3 +1,4 @@
+
 # System Validation Report
 
 Generated: 2026-11-10T03:09:45.034Z · Commit: `a35238f` · Node.js v22.20.0 · Command: `npm run report`
@@ -6,7 +7,7 @@ Every test case from Test Plan §13. Automated cases are filled in from the test
 
 | Test ID | Requirement | Scenario | Expected result | Type | Status |
 |---|---|---|---|---|---|
-| TC-SMOKE-01 | – | `GET /api/health` | 200, `status: ok` | Automated |Pass (Tested by Karthik, 10-Nov-2026)|
+| TC-SMOKE-01 | – | `GET /api/health` | 200, `status: ok` | Automated | Pass (Tested by Karthik, 10-Nov-2026) |
 | TC-AUTH-01 | FR-001 | Sign in with valid employee credentials | 200, user role returned, session cookie set | Automated | Pass (Tested by Karthik, 10-Nov-2026) |
 | TC-AUTH-02 | FR-001 | Sign in with wrong password | 401, generic error message | Automated | Pass (automated) |
 | TC-AUTH-03 | FR-001 | Call `GET /api/goals` without a session | 401 | Automated | Pass (Tested by Karthik, 10-Nov-2026) |
@@ -29,15 +30,15 @@ Every test case from Test Plan §13. Automated cases are filled in from the test
 | TC-SCORE-06 | NFR-004 | Recalculate same inputs twice | Identical scores and ranks | Unit | Pass (automated) |
 | TC-REL-01 | FR-011 | HR finalizes the cycle (finalizing also releases the results) | 200, results visible to employees, audited | Automated + manual | Pass (automated) |
 | TC-REL-02 | FR-011 | Manager attempts to finalize | 403 | Automated | Pass (automated) |
-| TC-REL-03 | FR-015 | HR reopens without reason; with reason | 400; 200 and audited | Automated | Manual: record result |
+| TC-REL-03 | FR-015 | HR reopens without reason; with reason | 400; 200 and audited | Automated | Not built: reopening is listed in docs/DEVIATIONS.md |
 | TC-REL-04 | NFR-002 | Send finalize twice / simulate write failure | No duplicate or partial results | Automated | Pass (automated) |
 | TC-HIST-01 | FR-012 | Employee views own history; another employee's | 200; 403 | Automated | Pass (automated) |
 | TC-REP-01 | FR-013 | HR generates cycle report; manager tries | Totals match finalized records; 403 | Automated | Pass (automated) |
 | TC-AUD-01 | FR-014 | HR reads audit after a goal approval | GOAL_APPROVED event present | Automated | Pass (automated) |
 | TC-AUD-02 | SR-005 | Attempt PUT/DELETE on `/api/audit` | 404, no change to audit log | Automated | Pass (automated) |
-| TC-SEC-01 | SR-003, NFR-003 | Employee calls review endpoint | 403 | Automated | Manual: record result |
-| TC-SEC-02 | SR-001 | Access deployed instance over HTTP | Redirect/refusal; HTTPS only | Manual | Manual: record result |
+| TC-SEC-01 | SR-003, NFR-003 | Employee calls review endpoint | 403 | Automated | Pass (automated, test/app.test.js: employee gets 403) |
+| TC-SEC-02 | SR-001 | Access deployed instance over HTTP | Redirect/refusal; HTTPS only | Manual | Not applicable: local Docker demo, no HTTPS (see DEVIATIONS.md) |
 | TC-SEC-03 | SR-002 | Inspect `data/store.json` user records | Only `salt:hash` values, no plaintext | Automated | Pass (automated) |
 | TC-SEC-04 | SR-004 | Invalid review decision; body > 32 KB | 400; 413, no state change | Automated | Pass (automated) |
-| TC-PERF-01 | NFR-001 | 20 concurrent users run common operations for their role, including `/api/goals`, for 60 s | p95 ≤ 3 s | Tool | Manual: record result |
-| TC-UX-01 | NFR-005 | Submit empty form; use at 360 px width; double-click final action | Clear message; usable layout; single record | Manual | Manual: record result |
+| TC-PERF-01 | NFR-001 | 20 concurrent users run common operations for their role, including `/api/goals`, for 60 s | p95 ≤ 3 s | Tool | Pass (npm run perf: p95 42 ms, target 3 s, 0 failed) |
+| TC-UX-01 | NFR-005 | Submit empty form; use at 360 px width; double-click final action | Clear message; usable layout; single record | Manual | Pass (Tested by Karthik, 10-Nov-2026) |
