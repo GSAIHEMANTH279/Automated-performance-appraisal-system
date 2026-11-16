@@ -37,23 +37,23 @@ Open http://localhost:3000. Finalizing closes the cycle, so **delete `data/store
 | # | Sign in as | Do this | Show / say | Owner |
 |---|---|---|---|---|
 | 1 | HR | Open **Appraisal cycles** | HR sets up the cycle (FY 2026, Open) and goal weights (APAS-14) | Sreeram |
-| 2 | Employee | Submit a goal: title, metric, due date, weight | Goal saved as Submitted; an invalid goal shows a clear error (APAS-9) | Nivas |
-| 3 | Manager | Approve the goal with a comment | Only the employee's own manager can review | Nivas |
-| 4 | Employee (Asha) | Add a progress update (80%, note) | Timestamped progress on an approved goal (APAS-21) | Hemanth |
-| 5 | Employee (Asha) | **My self-assessment** → submit (rating 1–5 + comment per goal) | Locked after submit (APAS-10) | Karthik |
-| 6 | Manager | **My team's appraisals** → rate Asha | Manager can rate only their own team (APAS-11) | Sreeram |
-| 7 | HR | **Finalize and rank** → **Finalize cycle** | Score = 30% self + 70% manager, weighted by goal weight; ranking with tie rule (APAS-12, APAS-13) | Nivas, Karthik |
+| 2 | Employee | Submit a goal: title, metric, due date, **weight 100** | Goal saved as Submitted; an invalid goal shows a clear error (APAS-9) | Nivas |
+| 3 | Manager | Approve that goal with a comment | Only the employee's own manager can review (APAS-9) | Nivas |
+| 4 | Employee | Add a progress update (80%, note) on the approved goal | Timestamped progress on an approved goal (APAS-21) | Hemanth |
+| 5 | Employee | **My self-assessment** → submit (rating 1–5 + comment) | Locked after submit (APAS-10) | Karthik |
+| 6 | Manager | **My team's appraisals** → rate the employee's goal | Manager can rate only their own team (APAS-11) | Sreeram |
+| 7 | HR | **Finalize and rank** → **Finalize cycle** | Score = 30% self + 70% manager, weighted by goal weight; ranking with tie rule (APAS-12, APAS-13). With ratings 4 and 5 the employee scores 4.70, Outstanding | Nivas, Karthik |
 | 8 | HR | Open **Cycle report** | Counts, average score, band breakdown, ranking (APAS-22) | Hemanth |
-| 9 | Employee (Asha) | **My results** | Score, band and rank; employees cannot see others' results (APAS-22) | Hemanth |
+| 9 | Employee | **My results** | Score, band and rank; employees cannot see others' results (APAS-22) | Hemanth |
 | 10 | HR | **Recent audit events** | Every action recorded with who, what and when (APAS-16) | Sreeram |
 
-Order matters: approve the new goal in step 3 **after** step 7 if you want finalization to succeed, because every employee with approved goals must be rated first and their weights must add up to 100.
+**Before the demo (tested sequence):** HR can finalize only when every employee with approved goals is rated. The seed data gives Asha Rao two approved goals (60 + 40), so complete her appraisal first: sign in as Asha and submit her self-assessment, then sign in as the manager and rate her. Then run steps 1–10 above. This is the sequence recorded in `demo/sprint2-demo.mp4`.
 
 ## If something goes wrong
 
 | Problem | Fix |
 |---|---|
-| "Still waiting for ratings: …" on finalize | That employee has approved goals but no ratings. Restart with fresh data and approve the new goal after finalizing |
+| "Still waiting for ratings: …" on finalize | That employee has approved goals but no ratings. Complete that employee's self-assessment and manager rating, then finalize again |
 | "…approved goals must add up to 100" | Goal weights of one employee don't total 100. Restart with fresh data |
 | Login fails | Check the email ends in `@apas.local` and the password is role + `123` |
 | Port 3000 busy | `PORT=3001 npm start` and open http://localhost:3001 |
