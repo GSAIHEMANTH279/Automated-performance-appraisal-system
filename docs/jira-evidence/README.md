@@ -29,6 +29,8 @@ The board backlog is empty because every work item was completed in Sprint 1 or 
 
 ### Sprint 1 (27–31 Oct 2026): 8 items, 23 points
 
+Sprint 1 report, scope log: the 8 items and their estimates were added on 29 Oct (APAS-7 on 31 Oct).
+
 ![Sprint 1 report](03-sprint1-backlog.png)
 
 | Key | Work item | Owner | Points |
@@ -43,6 +45,8 @@ The board backlog is empty because every work item was completed in Sprint 1 or 
 | APAS-19 | Sprint 1: capture product verification and demo evidence | J Karthik | 2 |
 
 ### Sprint 2 (2–7 Nov 2026): 14 items, 56 points
+
+Sprint 2 report, completed work items: all 14 items Done with their owners and story points.
 
 ![Sprint 2 report](04-sprint2-backlog.png)
 
@@ -65,11 +69,7 @@ The board backlog is empty because every work item was completed in Sprint 1 or 
 
 ## 4. Sprint progress
 
-The board with every item in Done, and the velocity across both sprints.
-
-![Board](05-board.png)
-
-![Velocity chart](06-velocity.png)
+Progress is shown by the sprint reports in section 3 (Sprint 2: 14 of 14 items completed, 56 of 56 points) and by the burndown charts in section 5, which track the remaining story points day by day. Velocity: 23 points in Sprint 1, 56 points in Sprint 2.
 
 ## 5. Burndown charts
 
