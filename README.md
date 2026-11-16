@@ -165,6 +165,8 @@ Each stage runs only if the previous one passed, so a failing test blocks deploy
 
 Work is tracked in the Jira project **APAS** with story points, owners and a burndown chart.
 
+Screenshots of the Jira dashboard, product backlog, sprint backlogs, sprint progress and burndown charts are in [docs/jira-evidence](docs/jira-evidence/README.md).
+
 | Milestone | Dates | Focus |
 |---|---|---|
 | Deliverables | before 27 Oct 2026 | SRS, SAD, Test Plan |
