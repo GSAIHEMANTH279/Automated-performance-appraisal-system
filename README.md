@@ -167,6 +167,8 @@ Work is tracked in the Jira project **APAS** with story points, owners and a bur
 
 Screenshots of the Jira dashboard, product backlog, sprint backlogs, sprint progress and burndown charts are in [docs/jira-evidence](docs/jira-evidence/README.md).
 
+The final presentation (4 slides) is in [docs/presentation](docs/presentation/) as PowerPoint and PDF; the live demo steps are in [docs/DEMO-CHECKLIST.md](docs/DEMO-CHECKLIST.md).
+
 | Milestone | Dates | Focus |
 |---|---|---|
 | Deliverables | before 27 Oct 2026 | SRS, SAD, Test Plan |
