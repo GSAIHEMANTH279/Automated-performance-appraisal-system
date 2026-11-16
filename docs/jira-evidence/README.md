@@ -21,6 +21,10 @@ All 22 work items with their status, owner and story points.
 
 ![Product backlog](02-product-backlog.png)
 
+The board backlog is empty because every work item was completed in Sprint 1 or Sprint 2:
+
+![Empty backlog after both sprints](02b-backlog-empty.png)
+
 ## 3. Sprint backlogs
 
 ### Sprint 1 (27–31 Oct 2026): 8 items, 23 points
