@@ -17,7 +17,7 @@ Screenshots from the Jira project **APAS** (board 4), taken on 16 Nov 2026 after
 
 ## 2. Product backlog
 
-All 22 work items with their status, owner and story points.
+All 22 work items (22 of 22) with their owner, priority and status.
 
 ![Product backlog](02-product-backlog.png)
 
